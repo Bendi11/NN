@@ -1,6 +1,7 @@
 #include "include/net.hpp"
 #include <assert.h>
 #include <iostream>
+#include <fstream>
 
 #define MAX(x, y) (x > y) ? x : y
 
@@ -210,5 +211,51 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
 
 void net::train(const set& in)
 {
+    size_t s = in.size(); //Get size once 
+    for(unsigned i = 0; i < s; ++i) //Iterate through every piece of data given
+    {
+        propFW(in[i].first); //Propogate the data forwards
+        backProp(in[i].second); //Train on given expected outputs
+    }
+}
+
+void layer::write(std::ofstream& fStream)
+{
+    size_t s; //Size temporary variable
+
+    s = outs.size();
+    fStream.write( (char *)&size, sizeof(size_t) ); 
+    fStream.write( (char *)outs.data(), outs.size() ); //Write outputs to file
+
+    s = bias.size();
+    fStream.write( (char *)&size, sizeof(size_t) ); 
+    fStream.write( (char *)bias.data(), bias.size() ); //Write bias to file
     
+    s = gradients.size();
+    fStream.write( (char *)&size, sizeof(size_t) ); 
+    fStream.write( (char *)gradients.data(), gradients.size() ); //Write gradients to file
+
+    s = weights.size();
+    fStream.write((char *)&s, sizeof(size_t)); //Write size of weight matrix to file
+
+    for(unsigned i = 0; i < size; ++i) //For every weight...
+    {
+        s = weights[i].size();
+        fStream.write( (char *)&size, sizeof(size_t) ); 
+        fStream.write( (char *)weights.data(), s);
+    }
+
+    fStream.write( (char *)&LR, sizeof(float));
+    fStream.flush();
+}
+
+void net::write(const std::string path)
+{
+    std::ofstream writer(path, std::ios::binary); //Open the file in binary mode
+    for(auto& lay : layers)
+    {
+        lay.write(writer);
+    }
+    writer.flush();
+    writer.close();
 }

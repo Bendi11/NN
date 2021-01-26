@@ -14,6 +14,7 @@ public:
     void calcOutputGradients(const std::vector<float>& expected); //Function to calculate neuron gradients if this is the output layer
     void calcHiddenGradients(const layer& next); //Function to calculate gradients of a hidden network layer
     void updateWeights(const layer& next); //Function to update weights based on calculated gradients
+    void write(std::ofstream& fStream); //Function to write a network to a file
 
     std::vector<float> outs;
     std::vector<float> bias;
@@ -30,6 +31,8 @@ public:
     void addLayer(unsigned int numOuts, unsigned int numIn = 0); //Function to add a layer to the network
     void train(const set& in); //Convenience function to load a training set and train on it
     layer& getOut(); //Function returning network outputs
+    void write(const std::string path); //Function to write a neural network to a file
+    static net load(const std::string path); //Function to load a neural network from a file
 
     void propFW(const std::vector<float>& in); //Function to propogate input data through the network
     void propFW(float* in, size_t size); //Function to load a float array to the network
