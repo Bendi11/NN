@@ -1,18 +1,21 @@
 #include "include/net.hpp"
 #include <iostream>
 #include <time.h>
+#include "include/gui.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "include/stb_image.h"
 #include <assert.h>
 
-#define STRBOOL(x) (x == false) ? "Non-Moon Picture" : "Moon Picture"
 
 set trainingData;
 
+wxIMPLEMENT_APP_NO_MAIN(guiApp);
+
+
 int main(int argc, char* argv[])
 {
-
+    wxEntry(argc, argv);
     int w;
     int h;
     int ch; 
@@ -49,11 +52,11 @@ int main(int argc, char* argv[])
 
     net n;
     n.addLayer(w * h * ch, 1);
-    n.addLayer(500);
+    n.addLayer(1000);
     n.addLayer(500);
     n.addLayer(1);
 
-    for(unsigned int i = 0; i < 20; ++i)
+    for(unsigned int i = 0; i < 50; ++i)
     {
         n.train(trainingData);
         std::cout << "Epoch: " << i << std::endl;
