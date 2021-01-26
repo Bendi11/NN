@@ -2,8 +2,11 @@
 #include <assert.h>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #define MAX(x, y) (x > y) ? x : y
+
+//#define _DEBUG_
 
 float dot(const std::vector<float>& v1, const std::vector<float>& v2) //Function to take dot product of two vectors
 {
@@ -223,39 +226,119 @@ void layer::write(std::ofstream& fStream)
 {
     size_t s; //Size temporary variable
 
-    s = outs.size();
-    fStream.write( (char *)&size, sizeof(size_t) ); 
-    fStream.write( (char *)outs.data(), outs.size() ); //Write outputs to file
+    fStream << LR << ' ' << size << ' ';; //Write metadata about layer
 
-    s = bias.size();
-    fStream.write( (char *)&size, sizeof(size_t) ); 
-    fStream.write( (char *)bias.data(), bias.size() ); //Write bias to file
-    
-    s = gradients.size();
-    fStream.write( (char *)&size, sizeof(size_t) ); 
-    fStream.write( (char *)gradients.data(), gradients.size() ); //Write gradients to file
+    for(auto& out : outs)
+    {
+        fStream << out << ' ';
+    }
 
-    s = weights.size();
-    fStream.write((char *)&s, sizeof(size_t)); //Write size of weight matrix to file
+    for(auto& b : bias)
+    {
+        fStream << b << ' ';
+    }
+
+    for(auto& grad : gradients)
+    {
+        fStream << grad << ' ';
+    }
+
+    fStream << weights[0].size() << ' '; //Write total size of weights matrix and size of each vector inside each vector
 
     for(unsigned i = 0; i < size; ++i) //For every weight...
     {
-        s = weights[i].size();
-        fStream.write( (char *)&size, sizeof(size_t) ); 
-        fStream.write( (char *)weights.data(), s);
+        for(auto& w : weights[i])
+        {
+            fStream << w << ' ';
+        }
     }
-
-    fStream.write( (char *)&LR, sizeof(float));
-    fStream.flush();
 }
 
-void net::write(const std::string path)
+void net::write(std::string path)
 {
-    std::ofstream writer(path, std::ios::binary); //Open the file in binary mode
+    std::ofstream writer; //Open the file in binary mode
+    unsigned i = 0;
     for(auto& lay : layers)
     {
+        writer.open(path + std::to_string(i) + ".NN");
         lay.write(writer);
+        writer.flush();
+        writer.close();
+        i++;
     }
     writer.flush();
     writer.close();
+}
+
+layer::layer(std::ifstream& file)
+{
+    size_t s; //Size temporary variable
+    file >> LR;
+    file >> size;
+
+    outs.reserve(size); //Allocate enough memory to hold entire output vector
+    for(unsigned i = 0; i < size; ++i)
+    {
+        float f;
+        file >> f;
+        outs.push_back(f); 
+    }
+
+    bias.reserve(size);
+    for(unsigned i = 0; i < size; ++i)
+    {
+        float f;
+        file >> f;
+        bias.push_back(f);
+    }
+
+    gradients.reserve(size); 
+    for(unsigned i = 0; i < size; ++i)
+    {
+        float f;
+        file >> f;
+        gradients.push_back(f);
+    }
+
+    file >> s; //Get number of inputs to network
+    weights.resize(size);
+
+    for(unsigned i = 0; i < size; ++i) //For every weight...
+    {
+        for(unsigned j = 0; j < s; ++j) //For every input...
+        {
+            float f;
+            file >> f;
+            weights[i].push_back(f);
+        }
+    }
+
+    #ifdef _DEBUG_
+    std::cout << "Read layer into file!" << std::endl;
+    std::cout << "Output size: " << outs.size() << std::endl;
+    std::cout << "Bias size: " << bias.size() << std::endl;
+    std::cout << "Gradients size: " << gradients.size() << std::endl;
+    std::cout << "Input number: " << weights[0].size() << std::endl;
+    #endif
+}
+
+net::net(std::string fNames)
+{
+    std::ifstream reader(fNames + "0" + ".NN"); //Reader file object for reading all neural network layers
+    for(unsigned i = 0; reader.is_open(); ++i)
+    {
+        reader.close();
+        reader.open(fNames + std::to_string(i) + ".NN"); //Open the next layer file
+
+        #ifdef _DEBUG_
+        std::cout << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
+        #endif
+
+        if(!reader.is_open())
+        {
+            break;
+        }
+        layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
+    }
+    numLays = layers.size();
 }

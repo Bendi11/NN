@@ -27,6 +27,10 @@ int main(int argc, char* argv[])
     trainingData.push_back( std::make_pair<std::vector<float>, std::vector<float> >(std::vector<float>(imgDat, imgDat + (w * h * ch) ) , {1.0f} ) );
     stbi_image_free(imgDat);
 
+    imgDat = stbi_loadf(".\\moon3.bmp", &w, &h, &ch, STBI_rgb);
+    trainingData.push_back( std::make_pair<std::vector<float>, std::vector<float> >(std::vector<float>(imgDat, imgDat + (w * h * ch) ) , {1.0f} ) );
+    stbi_image_free(imgDat);
+
 
 
     imgDat = stbi_loadf(".\\non0.bmp", &w, &h, &ch, STBI_rgb);
@@ -42,22 +46,18 @@ int main(int argc, char* argv[])
     stbi_image_free(imgDat);
 
 
-    net n;
-    n.addLayer(w * h * ch, 1);
-    n.addLayer(500);
-    n.addLayer(500);
-    n.addLayer(1);
+    net n("Network");
+    //n.addLayer(w * h * ch, 1);
+    //n.addLayer(500);
+    //n.addLayer(500);
+    //n.addLayer(1);
 
-    std::vector<float> ans[2];
-    ans[0].push_back(1.0f);
-    ans[1].push_back(0.0f);
-
-    for(unsigned int i = 0; i < 50; ++i)
+    for(unsigned int i = 0; i < 20; ++i)
     {
-        n.train(trainingData);
+        //n.train(trainingData);
         std::cout << "Epoch: " << i << std::endl;
     }
-    n.write("Network.NN");
+    //n.write("Network");
 
     for(unsigned j = 0; j < trainingData.size(); ++j)
     {
