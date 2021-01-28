@@ -6,7 +6,7 @@
 
 #define MAX(x, y) (x > y) ? x : y
 
-#define _DEBUG_
+//#define _DEBUG_
 
 float dot(const std::vector<float>& v1, const std::vector<float>& v2) //Function to take dot product of two vectors
 {
@@ -96,9 +96,6 @@ void layer::calcHiddenGradients(const layer& next) //Function to calculate hidde
         }
 
         gradients[i] = sum * sig_d(outs[i]);
-        #ifdef _DEBUG_ 
-        std::cout << "Neuron # " << i << " Hidden gradient: " << gradients[i] << std::endl;
-        #endif
     }
 }
 
@@ -108,18 +105,10 @@ void layer::updateWeights(const layer& prev) //Function to update weights based 
     {
         bias[i] -= gradients[i];
 
-        #ifdef _DEBUG_
-        std::cout << "Neuron #" << i << " bias: " << bias[i] << std::endl;
-        #endif
-
         for(unsigned j = 0; j < prev.size; ++j) //For every neuron in the previous layer
         {
             float delta = LR * prev.outs[j] * gradients[i]; 
             weights[i][j] -= delta;
-
-            #ifdef _DEBUG_
-            //std::cout << "Neuron #" << i << " New weight: " << weights[i][j] << std::endl;
-            #endif
         }
     }
 }
