@@ -1,14 +1,13 @@
-#include "include/net.hpp"
-#include <iostream>
-#include <time.h>
+//#include "include/net.hpp"
+//#include <iostream>
+//#include <time.h>
 #include "include/gui.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "include/stb_image.h"
-#include <assert.h>
+//#include "include/stb_image.h"
+//#include <assert.h>
 
 
-set trainingData;
 
 wxIMPLEMENT_APP_NO_MAIN(guiApp);
 
@@ -20,7 +19,7 @@ int main(int argc, char* argv[])
     int h;
     int ch; 
 
-    float *imgDat = stbi_loadf(".\\moon0.jpg", &w, &h, &ch, STBI_rgb);
+    /*float *imgDat = stbi_loadf(".\\moon0.jpg", &w, &h, &ch, STBI_rgb);
     trainingData.push_back( std::make_pair<std::vector<float>, std::vector<float> >(std::vector<float>(imgDat, imgDat + (w * h * ch) ) , {1.0f} ) );
     stbi_image_free(imgDat);
     imgDat = stbi_loadf(".\\moon1.jpg", &w, &h, &ch, STBI_rgb);
@@ -79,5 +78,5 @@ int main(int argc, char* argv[])
     }   
 
     char c;
-    std::cin >> c;
+    std::cin >> c;*/
 }

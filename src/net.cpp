@@ -6,7 +6,7 @@
 
 #define MAX(x, y) (x > y) ? x : y
 
-//#define _DEBUG_
+#define _DEBUG_
 
 float dot(const std::vector<float>& v1, const std::vector<float>& v2) //Function to take dot product of two vectors
 {
@@ -37,8 +37,8 @@ float sig_d(float x)
 
 layer::layer(size_t numIn, size_t numOut) : size(numOut) //Function to construct a layer based on given size
 {
-    outs.resize(size, 100.0f); 
-    gradients.resize(size, 100.0f);
+    outs.resize(size, 1.0f); 
+    gradients.resize(size, 1.0f);
     bias.resize(size, 0.5f);
     weights.resize(size);
 
