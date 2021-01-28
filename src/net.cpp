@@ -309,14 +309,11 @@ layer::layer(std::ifstream& file)
     #endif
 }
 
-net::net(std::string fNames)
+net::net(std::string fName)
 {
-    std::ifstream reader(fNames + "0" + ".NN"); //Reader file object for reading all neural network layers
+    std::ifstream reader(fName); //Reader file object for reading all neural network layers
     for(unsigned i = 0; reader.is_open(); ++i)
     {
-        reader.close();
-        reader.open(fNames + std::to_string(i) + ".NN"); //Open the next layer file
-
         #ifdef _DEBUG_
         std::cout << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
         #endif
@@ -328,4 +325,5 @@ net::net(std::string fNames)
         layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
     }
     numLays = layers.size();
+    reader.close();
 }
