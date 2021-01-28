@@ -42,7 +42,7 @@ public:
 
 private:
     std::vector<layer> layers; //The layout of the network
-    unsigned int numLays; //The number of layers in network
+    size_t numLays; //The number of layers in network
     std::string name; //Name of neural network
 
 };

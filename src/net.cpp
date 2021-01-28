@@ -57,7 +57,7 @@ void layer::propFW(const layer& prev) //Function to calculate outputs based on l
     for(unsigned i = 0; i < size; ++i)
     {
         float cache = 0.0f;
-        unsigned int psize = prev.outs.size(); //Get size once to avoid needing to get it every for loop iteration
+        size_t psize = prev.outs.size(); //Get size once to avoid needing to get it every for loop iteration
         for(unsigned j = 0; j < psize; ++j) //For every input...
         {
             cache += weights[i][j] * prev.outs[j]; //Do dot product
@@ -178,7 +178,7 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
 
     layers[layers.size() - 1].calcOutputGradients(expected);
 
-    for(unsigned int i = numLays - 2; i > 0; i--)
+    for(size_t i = numLays - 2; i > 0; i--)
     {
         #ifdef _DEBUG_
         std::cout << "LAYER " << i << std::endl;
@@ -187,7 +187,7 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
 
         
     }       
-    for(unsigned i = numLays - 1; i > 0; --i)
+    for(size_t i = numLays - 1; i > 0; --i)
     {
         #ifdef _DEBUG_
         if(i == numLays - 1)
@@ -224,8 +224,6 @@ void net::train(const set& in)
 
 void layer::write(std::ofstream& fStream)
 {
-    size_t s; //Size temporary variable
-
     fStream << LR << ' ' << size << ' ';; //Write metadata about layer
 
     for(auto& out : outs)
