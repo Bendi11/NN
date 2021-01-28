@@ -244,16 +244,15 @@ void layer::write(std::ofstream& fStream)
 void net::write(std::string path)
 {
     std::ofstream writer; //Open the file in binary mode
+    writer.open(path);
     unsigned i = 0;
     for(auto& lay : layers)
     {
-        writer.open(path + std::to_string(i) + ".NN");
         lay.write(writer);
-        writer.flush();
-        writer.close();
         i++;
+        if(i != numLays - 1) writer << " B ";
     }
-    writer.flush();
+    writer << " E";
     writer.close();
 }
 
@@ -312,7 +311,7 @@ layer::layer(std::ifstream& file)
 net::net(std::string fName)
 {
     std::ifstream reader(fName); //Reader file object for reading all neural network layers
-    for(unsigned i = 0; reader.is_open(); ++i)
+    while(!reader.eof() )
     {
         #ifdef _DEBUG_
         std::cout << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
@@ -323,6 +322,12 @@ net::net(std::string fName)
             break;
         }
         layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
+        char c;
+        reader >> c;
+        if(c == 'E') //End of file
+        {
+            break;
+        }
     }
     numLays = layers.size();
     reader.close();
