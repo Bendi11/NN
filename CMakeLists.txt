@@ -21,7 +21,7 @@ include_directories(
     "imgui"
 )
 
-set(SRCS 
+set(SOURCES 
     "src/main.cpp"
     "src/net.cpp"
     "src/gui.cpp"
@@ -43,7 +43,14 @@ set(SRCS
     imgui/imgui_stdlib.cpp
 )
 
-add_executable(${CMAKE_PROJECT_NAME} ${SRCS})
+if(WIN32)
+    set(CMAKE_CXX_FLAGS "/O2")
+    add_link_options("/subsystem:windows")
+    add_link_options("/nodefaultlib:msvcrt.lib")
+endif()
+
+
+add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENGL_gl_LIBRARY})
 target_link_libraries(${CMAKE_PROJECT_NAME}

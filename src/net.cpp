@@ -355,7 +355,7 @@ void net::load(net& in, std::string fName) //Same as constructor, but taking arg
     if(!reader.is_open())
     {
         logFile << "Failed to open NN file from " << fName << std::endl;
-        exit(-1);
+        return;
     }
     size_t i = 0; //Count of layers loaded
 

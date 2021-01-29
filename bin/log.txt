@@ -1,1 +1,1 @@
-Layer #1 loaded from file seeMoon.NN
+Failed to open NN file from 

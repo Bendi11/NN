@@ -72,23 +72,29 @@ void NNGUI::presentCreateWin()
     if( ImGui::Button("Load Neural Network from Entered Path") ) //User pressed button to load the NN from specified file
     {
         if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
-            future = std::async(std::launch::async, net::load, neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze        
-        else
-        {
-            ImGui::TextColored(ImVec4(1.0, 0.0, 0.0, 1.0), "Another process is already running");
-        }                               
-        
+        {    
+            future = std::async(std::launch::async, net::load, neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze    
+            std::cout << "Thread spawned!" << std::endl;
+        }                                    
     }
 
     ImGui::End();
 }
 
-void placeholder() {}
+void placeholder() {} //std::future not valid unless you do stupid things
 
 void NNGUI::drawNN()
 {
     if(future.valid() == false)
         future = std::async(std::launch::async, placeholder);
+
+    ImGui::BeginMainMenuBar();
+
+    if(future.wait_for(0ms) != std::future_status::ready)
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Another task is running...");
+
+    ImGui::EndMainMenuBar();
+    
     this->presentCreateWin();
 }
 
