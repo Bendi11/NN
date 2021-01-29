@@ -4,6 +4,8 @@
 #include <iostream>
 #include <random>
 
+inline std::ofstream logFile; //Yucky global variable but I need it to have a consistent log files
+
 typedef std::vector<std::pair<std::vector<float>, std::vector<float> > > set; //Ease of use type definitions with key value pairs
 
 struct layer //General layer class containing neurons and weights

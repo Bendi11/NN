@@ -24,6 +24,7 @@ include_directories(
 set(SRCS 
     "src/main.cpp"
     "src/net.cpp"
+    "src/gui.cpp"
 
     imgui/imconfig.h
     imgui/imgui.cpp
