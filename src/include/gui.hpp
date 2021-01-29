@@ -29,6 +29,8 @@ class NNGUI //Neural network GUI class
 {
 public:
     void presentCreateWin(); //Function to draw the Dear ImGui window for creating a NN 
+    void presentTrainWin();  //Function to draw Dear ImGui NN training window
+    
     void drawNN();           //Function to draw all windows
     NNGUI() { }
 
