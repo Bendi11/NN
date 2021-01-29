@@ -349,7 +349,7 @@ net::net(std::string fName) //Constructor to load a NN from one file
     reader.close();
 }
 
-void net::load(net& in, std::string fName) //Same as constructor, but taking argument instead
+void net::load(net* in, std::string fName) //Same as constructor, but taking argument instead
 {
     std::ifstream reader(fName); //Reader file object for reading all neural network layers
     if(!reader.is_open())
@@ -371,7 +371,7 @@ void net::load(net& in, std::string fName) //Same as constructor, but taking arg
         {
             break;
         }
-        in.layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
+        in->layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
         logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
         char c;
         reader >> c;
@@ -381,7 +381,29 @@ void net::load(net& in, std::string fName) //Same as constructor, but taking arg
         }
 
     }
-    in.numLays = in.layers.size();
+    in->numLays = in->layers.size();
+    logFile << in->numLays << std::endl;
     reader.close();
 }
 
+void net::save(net* in, std::string fName) //
+{
+    std::ofstream writer; //Open the file in binary mode
+    writer.open(fName);
+    if(!writer.is_open()) //File failed to open
+    {
+        logFile << "Error: Failed to open NN file at " << fName << std::endl;
+        return; //Don't exit program, but exit the function to write to file
+    }
+    
+    unsigned i = 0; //Only used to give progress bar indication
+    for(auto& lay : in->layers)
+    {
+        lay.write(writer);
+        if(i != in->numLays - 1) writer << " B ";     //Write layer separator character   
+        i++;
+
+    }
+    writer << " E"; //Write E to signify there are no more layers left
+    writer.close();
+}

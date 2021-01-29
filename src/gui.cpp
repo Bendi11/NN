@@ -73,9 +73,33 @@ void NNGUI::presentCreateWin()
     {
         if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
         {    
-            future = std::async(std::launch::async, net::load, neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze    
-            std::cout << "Thread spawned!" << std::endl;
+            future = std::async(std::launch::async, net::load, &neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze    
         }                                    
+    }
+    if( ImGui::Button("Save Neural Network to path"))
+    {
+        if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
+        {    
+            future = std::async(std::launch::async, net::save, &neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze    
+        }   
+    }
+    if( ImGui::BeginMenu("Create New Neural Network"))
+    {
+        ImGui::Text("Neural network layer count: %zd", neuralNet.numLays); //Display how big the network is
+        if(ImGui::Button("Reset Neural Network"))
+        {
+            neuralNet.~neuralNet();
+            neuralNet = net(); //Create a new neural network
+        }
+
+        static int layerSize; //The size of the layer the user is entering
+        ImGui::InputInt("Size of layer: ", &layerSize);
+        if(ImGui::Button("Add layer of specified size"))
+        {
+            neuralNet.addLayer(layerSize);
+        }
+
+        ImGui::EndMenu();
     }
 
     ImGui::End();

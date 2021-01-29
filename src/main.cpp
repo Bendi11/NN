@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
     GUI::initScreen(1280, 720);
     SDL_Event e;
     ImGuiIO io = ImGui::GetIO();
-    ImVec4 clear_color = ImVec4(0.5f, 0.5f, 0.f, 1.0f);
+    ImVec4 clear_color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
 
     GUI::NNGUI nnGUI;
 
