@@ -6,12 +6,16 @@
 #include "include/stb_image.h"
 #include <assert.h>
 
+#include "include/gui.hpp"
+
 set trainingData;
 
 float layer::LR = 0.00005f; //Default 0.005f
 
 int main(int argc, char* argv[])
 {
+    GUI::initScreen(1280, 720);
+
     int w;
     int h;
     int ch; 
@@ -77,4 +81,6 @@ int main(int argc, char* argv[])
 
     char c;
     std::cin >> c;
+
+    return 0;
 }

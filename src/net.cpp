@@ -1,7 +1,5 @@
 #include "include/net.hpp"
 #include <assert.h>
-#include <iostream>
-#include <fstream>
 #include <string>
 
 #define MAX(x, y) (x > y) ? x : y
@@ -320,7 +318,7 @@ net::net(std::string fName) //Constructor to load a NN from one file
     std::ifstream reader(fName); //Reader file object for reading all neural network layers
     if(!reader.is_open())
     {
-        std::cerr << "Failed to open NN file from " << fName << std::endl;
+        logFile << "Failed to open NN file from " << fName << std::endl;
         exit(-1);
     }
     size_t i = 0; //Count of layers loaded
