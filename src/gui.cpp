@@ -73,6 +73,7 @@ void NNGUI::presentCreateWin()
     {
         if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
         {    
+            neuralNet.~neuralNet(); //Destroy the old neural network
             future = std::async(std::launch::async, net::load, &neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze    
         }                                    
     }
