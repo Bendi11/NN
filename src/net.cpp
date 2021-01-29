@@ -348,3 +348,40 @@ net::net(std::string fName) //Constructor to load a NN from one file
     numLays = layers.size();
     reader.close();
 }
+
+void net::load(net& in, std::string fName) //Same as constructor, but taking argument instead
+{
+    std::ifstream reader(fName); //Reader file object for reading all neural network layers
+    if(!reader.is_open())
+    {
+        logFile << "Failed to open NN file from " << fName << std::endl;
+        exit(-1);
+    }
+    size_t i = 0; //Count of layers loaded
+
+    while(!reader.eof() )
+    {
+        i++;
+
+        #ifdef _DEBUG_
+        logFile << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
+        #endif
+
+        if(!reader.is_open())
+        {
+            break;
+        }
+        in.layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
+        logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
+        char c;
+        reader >> c;
+        if(c == 'E') //End of file
+        {
+            break;
+        }
+
+    }
+    in.numLays = in.layers.size();
+    reader.close();
+}
+

@@ -1,5 +1,6 @@
 #include "include/gui.hpp"
 
+
 std::ofstream logFile; 
 
 namespace GUI
@@ -65,11 +66,18 @@ void NNGUI::presentCreateWin()
 {
     ImGui::Begin("Neural Network Creation"); //Begin drawing to a new Dear ImGui window
 
-    ImGui::InputText("Set neural network file path", &NNFilePath);
+    ImGui::Text("Set network file path");
+    ImGui::InputText("", &NNFilePath);
     
     if( ImGui::Button("Load Neural Network from Entered Path") ) //User pressed button to load the NN from specified file
     {
-        neuralNet = net(NNFilePath); 
+        if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
+            future = std::async(std::launch::async, net::load, neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze        
+        else
+        {
+            ImGui::TextColored(ImVec4(1.0, 0.0, 0.0, 1.0), "Another process is already running");
+        }                               
+        
     }
 
     ImGui::End();

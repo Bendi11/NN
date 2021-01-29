@@ -40,7 +40,7 @@ set(SRCS
     imgui/imgui_impl_opengl3.h
     imgui/imgui_impl_sdl.cpp
     imgui/imgui_impl_sdl.h
-    imgui/imgui_stdlib.h
+    imgui/imgui_stdlib.cpp
 )
 
 add_executable(${CMAKE_PROJECT_NAME} ${SRCS})
