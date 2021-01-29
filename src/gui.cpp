@@ -83,4 +83,15 @@ void NNGUI::presentCreateWin()
     ImGui::End();
 }
 
+void placeholder() {}
+
+void NNGUI::drawNN()
+{
+    if(future.valid() == false)
+        future = std::async(std::launch::async, placeholder);
+    this->presentCreateWin();
+}
+
 } //End of GUI namespace
+
+

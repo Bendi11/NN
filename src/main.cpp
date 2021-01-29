@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
         //--------------------DRAWING DEAR IMGUI WINDOWS-------------------//
 
-        nnGUI.presentCreateWin();
+        nnGUI.drawNN();
 
         //--------------------END OF DRAWING DEAR IMGUI WINDOWS------------//
 

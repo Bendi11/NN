@@ -1,4 +1,1 @@
 Layer #1 loaded from file seeMoon.NN
-Layer #2 loaded from file seeMoon.NN
-Layer #3 loaded from file seeMoon.NN
-Layer #4 loaded from file seeMoon.NN
