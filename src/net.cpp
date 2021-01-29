@@ -249,8 +249,9 @@ void net::write(std::string path)
     for(auto& lay : layers)
     {
         lay.write(writer);
+        if(i != numLays - 1) writer << " B ";        
         i++;
-        if(i != numLays - 1) writer << " B ";
+
     }
     writer << " E";
     writer.close();
@@ -311,6 +312,11 @@ layer::layer(std::ifstream& file)
 net::net(std::string fName) //Constructor to load a NN from one file
 {
     std::ifstream reader(fName); //Reader file object for reading all neural network layers
+    if(!reader.is_open())
+    {
+        std::cerr << "Failed to open NN file from " << fName << std::endl;
+        exit(-1);
+    }
     size_t i = 0; //Count of layers loaded
 
     while(!reader.eof() )

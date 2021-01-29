@@ -22,7 +22,7 @@ public:
     std::vector<float> gradients;
     std::vector< std::vector<float> > weights;
     size_t size; //The number of numbers in the layer
-    float LR = 0.005f; //Learning rate of the entire network
+    static float LR; //Learning rate of the entire network
 
 };
 
