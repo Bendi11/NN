@@ -10,3 +10,4 @@ Makefile
 CMakeFiles
 *.NN
 Network
+*.lib
