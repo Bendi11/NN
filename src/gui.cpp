@@ -5,6 +5,9 @@ std::ofstream logFile;
 namespace GUI
 {
 
+SDL_Window* window = NULL;
+SDL_GLContext glContext;
+
 void initScreen(unsigned int w, unsigned int h)
 {
     logFile.open("log.txt"); //Open log file
@@ -30,15 +33,15 @@ void initScreen(unsigned int w, unsigned int h)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-    SDL_Window* window = SDL_CreateWindow("Neural Network", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL); //Attempt to create SDL2 window
+    window = SDL_CreateWindow("Neural Network", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_OPENGL); //Attempt to create SDL2 window
     if(window == NULL) //Window creation failed
     {   
         logFile << "Failed to create SDL2 window! Error: " << SDL_GetError() << std::endl; //Get the SDL2 error and exit the program
         exit(-1);
     }
 
-    SDL_GLContext gl_context = SDL_GL_CreateContext(window); //SDL2 OpenGL context creation for window
-    SDL_GL_MakeCurrent(window, gl_context);
+    glContext = SDL_GL_CreateContext(window); //SDL2 OpenGL context creation for window
+    SDL_GL_MakeCurrent(window, glContext);
 
     bool error = gladLoadGL() == 0; //Attempt to load all OpenGL extensions with glad
     if(error)
@@ -54,8 +57,22 @@ void initScreen(unsigned int w, unsigned int h)
     ImGui::StyleColorsDark(); //Enable dark color scheme by default
     ImGui::GetStyle().WindowRounding = 7.5f; //Make windows in Dear ImGui rounded at the corners
 
-    ImGui_ImplSDL2_InitForOpenGL(window, gl_context); //Setup window handling system for Dear ImGui
+    ImGui_ImplSDL2_InitForOpenGL(window, glContext); //Setup window handling system for Dear ImGui
     ImGui_ImplOpenGL3_Init(glsl_version); //Setup OpenGl rendering backend for Dear ImGui
+}
+
+void NNGUI::presentCreateWin()
+{
+    ImGui::Begin("Neural Network Creation"); //Begin drawing to a new Dear ImGui window
+
+    ImGui::InputText("Set neural network file path", &NNFilePath);
+    
+    if( ImGui::Button("Load Neural Network from Entered Path") ) //User pressed button to load the NN from specified file
+    {
+        neuralNet = net(NNFilePath); 
+    }
+
+    ImGui::End();
 }
 
 } //End of GUI namespace

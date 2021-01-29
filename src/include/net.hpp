@@ -43,9 +43,10 @@ public:
     void propFW(float* in, size_t size); //Function to load a float array to the network
     void backProp(const std::vector<float>& expected); //Function to update weights based on expected outputs
 
+    size_t numLays; //The number of layers in network
+
 private:
     std::vector<layer> layers; //The layout of the network
-    size_t numLays; //The number of layers in network
     std::string name; //Name of neural network
 
 };
