@@ -1,5 +1,7 @@
 #include "include/gui.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "include/stb_image.h"
 
 std::ofstream logFile; 
 
@@ -84,7 +86,7 @@ void NNGUI::presentCreateWin()
             future = std::async(std::launch::async, net::save, &neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze    
         }   
     }
-    if( ImGui::BeginMenu("Create New Neural Network"))
+    if( ImGui::BeginMenu("Create/Edit Neural Network"))
     {
         ImGui::Text("Neural network layer count: %zd", neuralNet.numLays); //Display how big the network is
         if(ImGui::Button("Reset Neural Network"))
@@ -93,11 +95,53 @@ void NNGUI::presentCreateWin()
             neuralNet = net(); //Create a new neural network
         }
 
+        for(size_t i = 0; i < neuralNet.numLays; ++i) //Display all layers of the neural network
+        {
+            if( ImGui::BeginMenu( ("Layer #" + std::to_string(i)).c_str() )) //Start a new menu for this layer
+            {
+                if(i == 0) //Special menu for input layer
+                { 
+                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Input Layer");
+                    ImGui::Text("Layer size: ", neuralNet.layers[0].size);
+                }
+                else if(i < neuralNet.numLays) //Hidden layer
+                {
+                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Hidden layer");
+                    ImGui::Text("Neurons: %zd", neuralNet.layers[i].size);
+                    ImGui::Text("Inputs: %zd", neuralNet.layers[i - 1].size);
+                }
+                else
+                {
+                    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Output layer");
+                    ImGui::Text("Outputs: %zd", neuralNet.layers[i].size);
+                    ImGui::Text("Inputs: %zd", neuralNet.layers[i - 1].size);
+                }
+                
+            }
+        }
+
         static int layerSize; //The size of the layer the user is entering
         ImGui::InputInt("Size of layer: ", &layerSize);
         if(ImGui::Button("Add layer of specified size"))
         {
             neuralNet.addLayer(layerSize);
+        }
+        ImGui::Spacing();
+
+        static std::string imgSizePath; //Image size path for loading
+        ImGui::Text("Path to load image with size data from: ");
+        ImGui::InputText("", &imgSizePath);
+        if(ImGui::Button("Add layer with enough neurons to fit image")) //User wants to add a layer with specified size
+        {  
+            int w, h, ch;
+            unsigned char* unused = stbi_load(imgSizePath.c_str(), &w, &h, &ch, 0); //Load image from path given
+            if(unused == nullptr)
+            {
+                imgSizePath = "Image invalid and failed to load";
+                return;
+            }
+            stbi_image_free(unused); //NO MEMORY LEAKS HERE OFFICER
+            neuralNet.addLayer(w * h * ch); //Add layer with image size
         }
 
         ImGui::EndMenu();

@@ -2,7 +2,6 @@
 #include <iostream>
 #include <time.h>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "include/stb_image.h"
 #include <assert.h>
 

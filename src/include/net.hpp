@@ -47,9 +47,9 @@ public:
     void backProp(const std::vector<float>& expected); //Function to update weights based on expected outputs
 
     size_t numLays; //The number of layers in network
+    std::vector<layer> layers; //The layout of the network
+
 
 private:
-    std::vector<layer> layers; //The layout of the network
-    std::string name; //Name of neural network
 
 };
