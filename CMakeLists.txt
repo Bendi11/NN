@@ -15,19 +15,11 @@ find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
 add_library("glad" "third-party/glad/src/glad.c")
 
-FetchContent_Declare(json
-  GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
-  GIT_TAG v3.9.1)
-
-FetchContent_GetProperties(json)
-if(NOT json_POPULATED)
-  FetchContent_Populate(json)
-  add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
 
 
 include_directories(
     "src/include"
+    "third-party/json/include"
     "third-party/glad/include/"
     ${CMAKE_SOURCE_DIR}
     "${CMAKE_SOURCE_DIR}/src/include"
@@ -74,3 +66,4 @@ target_link_libraries(${CMAKE_PROJECT_NAME} ${SDL2_LIBRARY})
 if(UNIX)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_DL_LIBS})
 endif()
+
