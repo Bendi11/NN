@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
+include(FetchContent) #For JSON fetching from git repo
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}) #For FindSDL2.cmake
+
 if(WIN32)
 include("E:\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake") #Find vcpkg script
 endif()
@@ -10,8 +13,17 @@ project(NN)
 find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
-
 add_library("glad" "third-party/glad/src/glad.c")
+
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
+  GIT_TAG v3.9.1)
+
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+  FetchContent_Populate(json)
+  add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 
 include_directories(
