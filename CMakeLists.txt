@@ -30,6 +30,7 @@ set(SOURCES
     "src/main.cpp"
     "src/net.cpp"
     "src/gui.cpp"
+    "src/dataLoader.cpp"
 
     third-party/imgui/imconfig.h
     third-party/imgui/imgui.cpp

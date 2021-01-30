@@ -14,7 +14,7 @@
 #include <chrono>
 
 #include "net.hpp"
-
+#include "dataLoader.hpp"
 
 namespace GUI
 {
@@ -30,6 +30,7 @@ class NNGUI //Neural network GUI class
 public:
     void presentCreateWin(); //Function to draw the Dear ImGui window for creating a NN 
     void presentTrainWin();  //Function to draw Dear ImGui NN training window
+    void presentDataWin(); //Function to display data loading from folder with manifest.json
     
     void drawNN();           //Function to draw all windows
     NNGUI() { }
@@ -37,6 +38,8 @@ public:
 private:
     net neuralNet; //Internal neural network object
     std::string NNFilePath; //The path to load a NN file from / save to
+    std::string statusString; //What string to display in the header
+    dataLoader datLoad; //The data loader object that will (duh) load all of our data for NN
     std::future<void> future; //If a thread is running a task currently
 
 };

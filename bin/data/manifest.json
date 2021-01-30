@@ -1,0 +1,9 @@
+{
+    "name": "Moon Image Recognition",
+    "inputType": "image",
+    "outputType": "number",
+    "data": 
+    [
+        {"input": "moon0.jpg", "output": [1.0]}
+    ]
+}

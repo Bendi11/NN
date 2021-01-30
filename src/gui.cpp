@@ -157,6 +157,25 @@ void NNGUI::presentCreateWin()
     ImGui::End();
 }
 
+void NNGUI::presentDataWin()
+{
+    ImGui::Begin("Data Loading");
+
+    ImGui::Text("Path to load data folder from");
+    static std::string dataPath; //Persistent string holding the folder with manifest.json
+    ImGui::InputText("", &dataPath); //Prompt user to enter the path
+
+    if(ImGui::Button("Load data from folder"))
+    {
+        if(!datLoad.parseFolder(dataPath)) //If parsing manifest.json fails...
+        {
+            statusString = datLoad.error;
+        }
+    }
+
+    ImGui::End();
+}
+
 void NNGUI::presentTrainWin()
 {
     
