@@ -3,6 +3,9 @@
 #include <vector>
 #include <iostream>
 #include <random>
+#include <fstream>
+
+extern std::ofstream logFile; //Yucky global variable but I need it to have a consistent log files
 
 typedef std::vector<std::pair<std::vector<float>, std::vector<float> > > set; //Ease of use type definitions with key value pairs
 
@@ -30,7 +33,10 @@ class net
 {
 public:
     net(std::string fNames); //Constructor to load a NN from a file
-    net() {} //Default constructor
+    static void load(net* in, std::string fName); //Function to load a NN from a file
+    static void save(net* in, std::string fName); //Async function to save a NN to a file
+    net() {numLays = 0;} //Default constructor
+
     void addLayer(unsigned int numOuts, unsigned int numIn = 0); //Function to add a layer to the network
     void train(const set& in); //Convenience function to load a training set and train on it
     layer& getOut(); //Function returning network outputs
@@ -40,9 +46,10 @@ public:
     void propFW(float* in, size_t size); //Function to load a float array to the network
     void backProp(const std::vector<float>& expected); //Function to update weights based on expected outputs
 
+    size_t numLays; //The number of layers in network
+
 private:
     std::vector<layer> layers; //The layout of the network
-    size_t numLays; //The number of layers in network
     std::string name; //Name of neural network
 
 };

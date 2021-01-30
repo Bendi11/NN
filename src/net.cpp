@@ -1,7 +1,5 @@
 #include "include/net.hpp"
 #include <assert.h>
-#include <iostream>
-#include <fstream>
 #include <string>
 
 #define MAX(x, y) (x > y) ? x : y
@@ -78,7 +76,7 @@ void layer::calcOutputGradients(const std::vector<float>& expected) //Function t
         gradients[i] = delta * sig_d(outs[i]);
 
         #ifdef _DEBUG_ 
-        std::cout << "Output neuron #" << i << " gradient: " << gradients[i] << " Delta: " << delta << std::endl;
+        logFile << "Output neuron #" << i << " gradient: " << gradients[i] << " Delta: " << delta << std::endl;
         #endif
     }
 }
@@ -124,7 +122,7 @@ void net::addLayer(unsigned int numOuts, unsigned int numIn) //Function to add a
     layers.push_back(layer(layers.back().size, numOuts)); //Add the layer to the network
     
     #ifdef _DEBUG_
-    std::cout << "Layer added with " << layers.back().size << " inputs and " << numOuts << " outputs" << std::endl;
+    logFile << "Layer added with " << layers.back().size << " inputs and " << numOuts << " outputs" << std::endl;
     #endif
 
 
@@ -157,12 +155,12 @@ layer& net::getOut() //Function returning the outputs of the network
 void net::backProp(const std::vector<float>& expected) //Function to backpropogate and train the neural network
 {
     #ifdef _DEBUG_
-    std::cout << 
+    logFile << 
     "--------------------BACK PROPOGATION--------------------" << std::endl;
     #endif
 
     #ifdef _DEBUG_
-    std::cout << "OUTPUT LAYER " << std::endl;
+    logFile << "OUTPUT LAYER " << std::endl;
     #endif
 
     layers[layers.size() - 1].calcOutputGradients(expected);
@@ -170,7 +168,7 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
     for(size_t i = numLays - 2; i > 0; i--)
     {
         #ifdef _DEBUG_
-        std::cout << "LAYER " << i << std::endl;
+        logFile << "LAYER " << i << std::endl;
         #endif
         layers[i].calcHiddenGradients(layers[i + 1]);
 
@@ -181,7 +179,7 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
         #ifdef _DEBUG_
         if(i == numLays - 1)
         {
-            std::cout << "OUTPUT LAYER: " << std::endl;    
+            logFile << "OUTPUT LAYER: " << std::endl;    
         }
         #endif
 
@@ -190,13 +188,13 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
         #ifdef _DEBUG_
         if(i == numLays - 1)
         {
-            std::cout << "END OUTPUT LAYER: " << std::endl;
+            logFile << "END OUTPUT LAYER: " << std::endl;
         }
         #endif
     }
 
     #ifdef _DEBUG_
-        std::cout << 
+        logFile << 
     "--------------------END BACK PROPOGATION--------------------" << std::endl;
     #endif
 }
@@ -245,15 +243,21 @@ void net::write(std::string path)
 {
     std::ofstream writer; //Open the file in binary mode
     writer.open(path);
-    unsigned i = 0;
+    if(!writer.is_open()) //File failed to open
+    {
+        logFile << "Error: Failed to open NN file at " << path << std::endl;
+        return; //Don't exit program, but exit the function to write to file
+    }
+    
+    unsigned i = 0; //Only used to give progress bar indication
     for(auto& lay : layers)
     {
         lay.write(writer);
-        if(i != numLays - 1) writer << " B ";        
+        if(i != numLays - 1) writer << " B ";     //Write layer separator character   
         i++;
 
     }
-    writer << " E";
+    writer << " E"; //Write E to signify there are no more layers left
     writer.close();
 }
 
@@ -301,11 +305,11 @@ layer::layer(std::ifstream& file)
     }
 
     #ifdef _DEBUG_
-    std::cout << "Read layer into file!" << std::endl;
-    std::cout << "Output size: " << outs.size() << std::endl;
-    std::cout << "Bias size: " << bias.size() << std::endl;
-    std::cout << "Gradients size: " << gradients.size() << std::endl;
-    std::cout << "Input number: " << weights[0].size() << std::endl;
+    logFile << "Read layer into file!" << std::endl;
+    logFile << "Output size: " << outs.size() << std::endl;
+    logFile << "Bias size: " << bias.size() << std::endl;
+    logFile << "Gradients size: " << gradients.size() << std::endl;
+    logFile << "Input number: " << weights[0].size() << std::endl;
     #endif
 }
 
@@ -314,7 +318,7 @@ net::net(std::string fName) //Constructor to load a NN from one file
     std::ifstream reader(fName); //Reader file object for reading all neural network layers
     if(!reader.is_open())
     {
-        std::cerr << "Failed to open NN file from " << fName << std::endl;
+        logFile << "Failed to open NN file from " << fName << std::endl;
         exit(-1);
     }
     size_t i = 0; //Count of layers loaded
@@ -324,7 +328,7 @@ net::net(std::string fName) //Constructor to load a NN from one file
         i++;
 
         #ifdef _DEBUG_
-        std::cout << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
+        logFile << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
         #endif
 
         if(!reader.is_open())
@@ -332,7 +336,7 @@ net::net(std::string fName) //Constructor to load a NN from one file
             break;
         }
         layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
-        std::cout << "Layer #" << i << " loaded from file " << fName << std::endl;
+        logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
         char c;
         reader >> c;
         if(c == 'E') //End of file
@@ -343,4 +347,63 @@ net::net(std::string fName) //Constructor to load a NN from one file
     }
     numLays = layers.size();
     reader.close();
+}
+
+void net::load(net* in, std::string fName) //Same as constructor, but taking argument instead
+{
+    std::ifstream reader(fName); //Reader file object for reading all neural network layers
+    if(!reader.is_open())
+    {
+        logFile << "Failed to open NN file from " << fName << std::endl;
+        return;
+    }
+    size_t i = 0; //Count of layers loaded
+
+    while(!reader.eof() )
+    {
+        i++;
+
+        #ifdef _DEBUG_
+        logFile << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
+        #endif
+
+        if(!reader.is_open())
+        {
+            break;
+        }
+        in->layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
+        logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
+        char c;
+        reader >> c;
+        if(c == 'E') //End of file
+        {
+            break;
+        }
+
+    }
+    in->numLays = in->layers.size();
+    logFile << in->numLays << std::endl;
+    reader.close();
+}
+
+void net::save(net* in, std::string fName) //
+{
+    std::ofstream writer; //Open the file in binary mode
+    writer.open(fName);
+    if(!writer.is_open()) //File failed to open
+    {
+        logFile << "Error: Failed to open NN file at " << fName << std::endl;
+        return; //Don't exit program, but exit the function to write to file
+    }
+    
+    unsigned i = 0; //Only used to give progress bar indication
+    for(auto& lay : in->layers)
+    {
+        lay.write(writer);
+        if(i != in->numLays - 1) writer << " B ";     //Write layer separator character   
+        i++;
+
+    }
+    writer << " E"; //Write E to signify there are no more layers left
+    writer.close();
 }

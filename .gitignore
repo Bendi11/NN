@@ -10,3 +10,6 @@ Makefile
 CMakeFiles
 *.NN
 Network
+*.lib
+log.txt
+imgui.ini
