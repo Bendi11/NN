@@ -199,14 +199,24 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
     #endif
 }
 
-void net::train(const set& in)
+void net::train(const set& in, int iterations)
 {
     size_t s = in.size(); //Get size once 
-    for(unsigned i = 0; i < s; ++i) //Iterate through every piece of data given
-    {
-        propFW(in[i].first); //Propogate the data forwards
-        backProp(in[i].second); //Train on given expected outputs
-    }
+    MSE = 0.0f; //Reset MSE before training
+
+    for(int j = 0; j < iterations; ++j) //Iterate as many times as given (default 1)
+        for(unsigned i = 0; i < s; ++i) //Iterate through every piece of data given
+        {
+            propFW(in[i].first); //Propogate the data forwards
+            backProp(in[i].second); //Train on given expected outputs
+            
+            for(unsigned k = 0; k < layers.back().size; ++k)
+            {
+                MSE += pow(in[i].second[k] - layers.back().outs[k], 2);
+            }
+        }
+
+    MSE /= s; 
 }
 
 void layer::write(std::ofstream& fStream)

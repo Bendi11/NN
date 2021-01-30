@@ -180,6 +180,11 @@ void NNGUI::presentDataWin()
 void NNGUI::presentTrainWin()
 {
     ImGui::Begin("Train Neural Network");
+    ImGui::Text("Neural Network MSE: %f", neuralNet.MSE);
+
+    ImGui::Text("Number of epochs (iterations) to train over data: ");
+    static int numIter = 0; //How many iterations to do
+    ImGui::InputInt("", &numIter);
 
     if(ImGui::Button("Train neural network using loaded dataset"))
     {
@@ -197,9 +202,17 @@ void NNGUI::presentTrainWin()
                 ImGui::End(); //Stop drawing to window
                 return;
             }
+            if(numIter < 0)
+            {
+                numIter = 0;
+                statusString = "Can't train neural network < 1 time";
+                ImGui::End();
+                return;
+            }
+
 
             const dataLoader::dataSet set = datLoad.loadAll(); 
-            future = std::async(std::launch::async, &net::train, &neuralNet, set); //Spawn new thread to do work
+            future = std::async(std::launch::async, &net::train, &neuralNet, set, numIter); //Spawn new thread to do work
         }         
     }
 

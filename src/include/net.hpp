@@ -38,7 +38,7 @@ public:
     net() {numLays = 0;} //Default constructor
 
     void addLayer(unsigned int numOuts, unsigned int numIn = 0); //Function to add a layer to the network
-    void train(const set& in); //Convenience function to load a training set and train on it
+    void train(const set& in, int iterations = 1); //Convenience function to load a training set and train on it
     layer& getOut(); //Function returning network outputs
     void write(std::string path); //Function to write a neural network to a file
 
@@ -47,6 +47,7 @@ public:
     void backProp(const std::vector<float>& expected); //Function to update weights based on expected outputs
 
     size_t numLays; //The number of layers in network
+    float MSE; //MSE calculated in train() function
     std::vector<layer> layers; //The layout of the network
 
 
