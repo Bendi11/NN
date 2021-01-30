@@ -52,11 +52,14 @@ if(WIN32)
 endif()
 
 
+
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENGL_gl_LIBRARY})
+target_link_libraries(${CMAKE_PROJECT_NAME} OpenGL::GL)
 target_link_libraries(${CMAKE_PROJECT_NAME}
     "glad"
 )
 target_link_libraries(${CMAKE_PROJECT_NAME} ${SDL2_LIBRARY})
-
+if(UNIX)
+target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_DL_LIBS})
+endif()
