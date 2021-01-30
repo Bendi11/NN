@@ -11,16 +11,15 @@ find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
 
-add_library("glad" "glad/src/glad.c")
+add_library("glad" "third-party/glad/src/glad.c")
 
 
 include_directories(
     "src/include"
-    "glad/include/"
+    "third-party/glad/include/"
     ${CMAKE_SOURCE_DIR}
     "${CMAKE_SOURCE_DIR}/src/include"
-    "${CMAKE_SOURCE_DIR}/src/modules/"
-    "imgui"
+    "third-party/imgui"
 )
 
 set(SOURCES 
@@ -28,21 +27,21 @@ set(SOURCES
     "src/net.cpp"
     "src/gui.cpp"
 
-    imgui/imconfig.h
-    imgui/imgui.cpp
-    imgui/imgui.h
-    imgui/imgui_draw.cpp
-    imgui/imgui_internal.h
-    imgui/imgui_widgets.cpp
-    imgui/imstb_rectpack.h
-    imgui/imstb_textedit.h
-    imgui/imgui_tables.cpp
-    imgui/imstb_truetype.h
-    imgui/imgui_impl_opengl3.cpp
-    imgui/imgui_impl_opengl3.h
-    imgui/imgui_impl_sdl.cpp
-    imgui/imgui_impl_sdl.h
-    imgui/imgui_stdlib.cpp
+    third-party/imgui/imconfig.h
+    third-party/imgui/imgui.cpp
+    third-party/imgui/imgui.h
+    third-party/imgui/imgui_draw.cpp
+    third-party/imgui/imgui_internal.h
+    third-party/imgui/imgui_widgets.cpp
+    third-party/imgui/imstb_rectpack.h
+    third-party/imgui/imstb_textedit.h
+    third-party/imgui/imgui_tables.cpp
+    third-party/imgui/imstb_truetype.h
+    third-party/imgui/imgui_impl_opengl3.cpp
+    third-party/imgui/imgui_impl_opengl3.h
+    third-party/imgui/imgui_impl_sdl.cpp
+    third-party/imgui/imgui_impl_sdl.h
+    third-party/imgui/imgui_stdlib.cpp
 )
 
 if(WIN32)

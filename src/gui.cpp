@@ -158,6 +158,9 @@ void NNGUI::presentCreateWin()
 }
 
 void NNGUI::presentTrainWin()
+{
+    
+}
 
 void placeholder() {} //std::future not valid unless you do stupid things
 
