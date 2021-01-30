@@ -91,8 +91,11 @@ void NNGUI::presentCreateWin()
         ImGui::Text("Neural network layer count: %zd", neuralNet.numLays); //Display how big the network is
         if(ImGui::Button("Reset Neural Network"))
         {
-            neuralNet.~net();
-            neuralNet = net(); //Create a new neural network
+            if(neuralNet.numLays != 0) //Don't call destructor twice, silly user!
+            {
+                neuralNet = net(); //Create a new neural network
+            }
+            
         }
 
         for(size_t i = 0; i < neuralNet.numLays; ++i) //Display all layers of the neural network
@@ -102,9 +105,9 @@ void NNGUI::presentCreateWin()
                 if(i == 0) //Special menu for input layer
                 { 
                     ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Input Layer");
-                    ImGui::Text("Layer size: ", neuralNet.layers[0].size);
+                    ImGui::Text("Input size: %zd", neuralNet.layers[0].size);
                 }
-                else if(i < neuralNet.numLays) //Hidden layer
+                else if(i < neuralNet.numLays - 1) //Hidden layer
                 {
                     ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Hidden layer");
                     ImGui::Text("Neurons: %zd", neuralNet.layers[i].size);
@@ -117,8 +120,11 @@ void NNGUI::presentCreateWin()
                     ImGui::Text("Inputs: %zd", neuralNet.layers[i - 1].size);
                 }
                 
+                ImGui::EndMenu();
             }
         }
+
+        ImGui::Spacing();
 
         static int layerSize; //The size of the layer the user is entering
         ImGui::InputInt("Size of layer: ", &layerSize);
@@ -144,11 +150,14 @@ void NNGUI::presentCreateWin()
             neuralNet.addLayer(w * h * ch); //Add layer with image size
         }
 
+
         ImGui::EndMenu();
     }
 
     ImGui::End();
 }
+
+void NNGUI::presentTrainWin()
 
 void placeholder() {} //std::future not valid unless you do stupid things
 
