@@ -73,7 +73,7 @@ void NNGUI::presentCreateWin()
     {
         if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
         {    
-            neuralNet.~neuralNet(); //Destroy the old neural network
+            neuralNet.~net(); //Destroy the old neural network
             future = std::async(std::launch::async, net::load, &neuralNet, NNFilePath); //Spawn a thread to load the NN so that the screen doesn't freeze    
         }                                    
     }
@@ -89,7 +89,7 @@ void NNGUI::presentCreateWin()
         ImGui::Text("Neural network layer count: %zd", neuralNet.numLays); //Display how big the network is
         if(ImGui::Button("Reset Neural Network"))
         {
-            neuralNet.~neuralNet();
+            neuralNet.~net();
             neuralNet = net(); //Create a new neural network
         }
 
