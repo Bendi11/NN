@@ -169,8 +169,9 @@ void NNGUI::presentDataWin()
     {
         if(!datLoad.parseFolder(dataPath)) //If parsing manifest.json fails...
         {
-            statusString = datLoad.error;
+            statusString = datLoad.error; //Get error and display it as the status
         }
+        else statusString = "Loaded " + std::to_string(datLoad.dataNum) + " data samples from folder";
     }
 
     ImGui::End();
@@ -178,7 +179,31 @@ void NNGUI::presentDataWin()
 
 void NNGUI::presentTrainWin()
 {
-    
+    ImGui::Begin("Train Neural Network");
+
+    if(ImGui::Button("Train neural network using loaded dataset"))
+    {
+        if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
+        {    
+            if(neuralNet.numLays == 0) //Network not initialized yet, silly!
+            {
+                statusString = "Can't train neural network, it doesn't exist";
+                ImGui::End(); //Stop drawing to window
+                return;
+            }
+            if(datLoad.dataNum == 0)
+            {
+                statusString = "Can't train neural network, no data loaded";
+                ImGui::End(); //Stop drawing to window
+                return;
+            }
+
+            const dataLoader::dataSet set = datLoad.loadAll(); 
+            future = std::async(std::launch::async, &net::train, &neuralNet, set); //Spawn new thread to do work
+        }         
+    }
+
+    ImGui::End();
 }
 
 void placeholder() {} //std::future not valid unless you do stupid things
@@ -191,11 +216,16 @@ void NNGUI::drawNN()
     ImGui::BeginMainMenuBar();
 
     if(future.wait_for(0ms) != std::future_status::ready)
-        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Another task is running...");
+    {
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "A task is running...");
+    }
+    ImGui::Text(statusString.c_str()); //Display whatever message we have
 
     ImGui::EndMainMenuBar();
     
     this->presentCreateWin();
+    this->presentTrainWin();
+    this->presentDataWin();
 }
 
 } //End of GUI namespace

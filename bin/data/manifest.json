@@ -4,6 +4,16 @@
     "outputType": "number",
     "data": 
     [
-        {"input": "moon0.jpg", "output": [1.0]}
+        {"input": "moon0.jpg", "output": [1.0]},
+        {"input": "moon1.jpg", "output": [1.0]},
+        {"input": "moon2.jpg", "output": [1.0]},
+        {"input": "moon3.jpg", "output": [1.0]},
+
+
+        {"input": "non0.jpg", "output": [0.0]},
+        {"input": "non1.jpg", "output": [0.0]},
+        {"input": "non2.jpg", "output": [0.0]},
+        {"input": "non3.jpg", "output": [0.0]}
+
     ]
 }

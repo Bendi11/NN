@@ -5,6 +5,8 @@
 bool dataLoader::parseFolder(const std::string path)
 {
     std::ifstream maniFile(path + "/manifest.json"); //Open JSON file
+    m_path = path + '/';
+
     if(!maniFile.is_open())
     {
         error = "Failed to open manifest.json at " + path;
@@ -68,7 +70,8 @@ const dataLoader::dataPoint dataLoader::loadSingleData(const unsigned int index)
         case dataTypes::image:
         {
             int w, h, ch; //Image size and channel markers
-            std::string fName = manifest["data"][index]["input"]; //Get input file name
+            std::string fName = m_path; //We heven't changed dirs, so load dir name before file
+            fName += manifest["data"][index]["input"]; //Get input file name
 
             float* imgDat = stbi_loadf(fName.c_str(), &w, &h, &ch, 0); //Use stb_image to load the file
             if(imgDat == nullptr)
@@ -92,7 +95,8 @@ const dataLoader::dataPoint dataLoader::loadSingleData(const unsigned int index)
         case dataTypes::image:
         {
             int w, h, ch; //Image size and channel markers
-            std::string fName = manifest["data"][index]["output"]; //Get input file name
+            std::string fName = m_path; //We heven't changed dirs, so load dir name before file
+            fName += manifest["data"][index]["output"]; //Get input file name
 
             float* imgDat = stbi_loadf(fName.c_str(), &w, &h, &ch, 0); //Use stb_image to load the file
             if(imgDat == nullptr)
