@@ -101,27 +101,7 @@ int main(int argc, char* argv[])
     //n.addLayer(500);
     //n.addLayer(1);
 
-    for(unsigned int i = 0; i < 10; ++i)
-    {
-        n.train(trainingData);
-        std::cout << "Epoch: " << i << std::endl;
-    }
-    n.write("seeMoon.NN");
 
-    for(unsigned j = 0; j < trainingData.size(); ++j)
-    {
-        n.propFW(trainingData[j].first);
-        std::cout << "Input: [ "; 
-        if(trainingData[j].second[0] == 1.0f)
-        {
-            std::cout << "Moon Picture";
-        }
-        else
-        {
-            std::cout << "Non-Moon Picture";
-        }
-        std::cout << " ] " << "\tOutput: [ " << n.getOut().outs[0]  << " ]" << std::endl;
-    }   */
     /*n.propFW(trainingData[0].first);
     std::cout << "Output after being shown Anno 1800 picture: " << n.getOut().outs[0] << std::endl;
 

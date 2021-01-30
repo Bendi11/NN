@@ -13,3 +13,4 @@ Network
 *.lib
 log.txt
 imgui.ini
+*.a
