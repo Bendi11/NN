@@ -8,7 +8,36 @@ std::ofstream logFile;
 namespace GUI
 {
 
-SDL_Window* window = NULL;
+struct image //Convenience class for displaying images in Dear ImGui windows
+{
+    GLuint txID; //Texture ID in OpenGL
+    int width; //Filled when image is loaded
+    int height;
+    int channels;
+
+    image::image(std::string path)
+    {
+        float* imgData = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
+        glGenTextures(1, &txID);
+        glBindTexture(GL_TEXTURE_2D, txID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void *)imgData);
+        stbi_image_free(imgData);
+    }
+
+    image()
+    {
+
+    }
+
+    ~image() //Destructor to clean up resources
+    {
+        glDeleteTextures(1, &txID);
+    }
+};
+
+SDL_Window* window = NULL; 
 SDL_GLContext glContext;
 
 void initScreen(unsigned int w, unsigned int h)
@@ -159,7 +188,8 @@ void NNGUI::presentCreateWin()
 
 void NNGUI::presentDataWin()
 {
-    ImGui::Begin("Data Loading");
+    static image displayedImg;
+    ImGui::Begin("Data");
 
     ImGui::Text("Path to load data folder from");
     static std::string dataPath; //Persistent string holding the folder with manifest.json
@@ -171,7 +201,45 @@ void NNGUI::presentDataWin()
         {
             statusString = datLoad.error; //Get error and display it as the status
         }
-        else statusString = "Loaded " + std::to_string(datLoad.dataNum) + " data samples from folder";
+        else
+        {
+            loadedSet = datLoad.loadAll();
+
+            statusString = "Loaded " + std::to_string(datLoad.dataNum) + " data samples from folder";
+        }
+
+    }
+
+    ImGui::Spacing();
+
+    if(ImGui::BeginMenu("Input sets"))
+    {
+        for(unsigned i = 0; i < loadedSet.size(); ++i) //Menu item for every loaded set
+        {
+            if(ImGui::BeginMenu( ("Input #" + std::to_string(i)).c_str()) )
+            {
+                if(datLoad.inputType == dataLoader::dataTypes::image) //Display image if the input is an image
+                {
+                    displayedImg = image(datLoad.manifest["data"][i]["input"].get<std::string>());
+                    ImGui::Image((ImTextureID)displayedImg.txID, ImVec2(displayedImg.width, displayedImg.height));
+                }
+
+                for(size_t j = 0; j < neuralNet.layers.back().size; ++j) //Display all neuron outputs
+                {
+                    ImGui::Text("Output: %f", neuralNet.layers.back().outs[j]);
+                }
+                ImGui::Spacing();
+                if(ImGui::Button("Propogate using input"))
+                {
+                    if(future.wait_for(0ms) == std::future_status::ready) //If we aren't running any other threads, go ahead
+                    {  
+                        future = std::async(std::launch::async, &net::propFW, &neuralNet, loadedSet[i].first); //Spawn new thread to do work
+                    }
+                }
+                ImGui::EndMenu();
+            }
+        }
+        ImGui::EndMenu();
     }
 
     ImGui::End();
@@ -181,6 +249,12 @@ void NNGUI::presentTrainWin()
 {
     ImGui::Begin("Train Neural Network");
     ImGui::Text("Neural Network MSE: %f", neuralNet.MSE);
+    ImGui::Text("Learning Rate: ");
+    static float enteredLR;
+    ImGui::InputFloat("", &enteredLR);
+    layer::LR = enteredLR;
+
+    ImGui::Spacing();
 
     ImGui::Text("Number of epochs (iterations) to train over data: ");
     static int numIter = 0; //How many iterations to do

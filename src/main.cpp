@@ -9,7 +9,6 @@
 
 set trainingData;
 
-float layer::LR = 0.005f; //Default 0.005f
 
 int main(int argc, char* argv[])
 {

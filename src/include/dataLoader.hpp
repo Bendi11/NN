@@ -38,13 +38,14 @@ public:
         textFile
     };
     std::string error;     //The error string
-
-
-private:
-    std::string m_path;    //Path to folder that data is being loaded from
     json manifest;         //The manifest.json object in C++
-    std::string name;
+
 
     dataTypes inputType;
     dataTypes outputType;
+
+private:
+    std::string m_path;    //Path to folder that data is being loaded from
+    std::string name;
+
 };

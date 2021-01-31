@@ -3,6 +3,8 @@
 #include <string>
 
 #define MAX(x, y) (x > y) ? x : y
+float layer::LR = 0.005f; //Default 0.005f
+
 
 //#define _DEBUG_
 
@@ -216,7 +218,7 @@ void net::train(const set& in, int iterations)
             }
         }
 
-    MSE /= s; 
+    MSE /= s * iterations; 
 }
 
 void layer::write(std::ofstream& fStream)

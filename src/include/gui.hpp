@@ -25,6 +25,8 @@ extern SDL_Window* window;
 extern SDL_GLContext glContext;
 void initScreen(unsigned int w, unsigned int h);
 
+
+
 class NNGUI //Neural network GUI class
 {
 public:
@@ -40,6 +42,7 @@ private:
     std::string NNFilePath; //The path to load a NN file from / save to
     std::string statusString; //What string to display in the header
     dataLoader datLoad; //The data loader object that will (duh) load all of our data for NN
+    dataLoader::dataSet loadedSet; //The loaded training data
     std::future<void> future; //If a thread is running a task currently
 
 };

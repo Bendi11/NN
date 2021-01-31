@@ -43,7 +43,6 @@ public:
     void write(std::string path); //Function to write a neural network to a file
 
     void propFW(const std::vector<float>& in); //Function to propogate input data through the network
-    void propFW(float* in, size_t size); //Function to load a float array to the network
     void backProp(const std::vector<float>& expected); //Function to update weights based on expected outputs
 
     size_t numLays; //The number of layers in network
