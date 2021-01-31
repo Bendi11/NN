@@ -26,6 +26,18 @@ struct image //Convenience class for displaying images in Dear ImGui windows
         stbi_image_free(imgData);
     }
 
+    image::image(const std::vector<float>& imgDat, int w, int h)
+    {
+        width = w;
+        height = h;
+
+        glGenTextures(1, &txID);
+        glBindTexture(GL_TEXTURE_2D, txID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, (void *)imgData);
+    }
+
     image()
     {
 
