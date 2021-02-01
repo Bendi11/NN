@@ -17,6 +17,8 @@ add_library("glad" "third-party/glad/src/glad.c")
 
 
 
+
+
 include_directories(
     "src/include"
     "third-party/json/include"
@@ -68,3 +70,10 @@ if(UNIX)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_DL_LIBS})
 endif()
 
+if(WIN32)
+find_path(PDC_INCLUDES curses.h)
+find_library(PDC_LIBS pdcurses REQUIRED)
+
+target_include_directories(${CMAKE_PROJECT_NAME} ${PDC_INCLUDES})
+target_link_libraries(${CMAKE_PROJECT_NAME} ${PDC_LIBS})
+endif()
