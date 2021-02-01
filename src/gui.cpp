@@ -162,7 +162,6 @@ void NNGUI::presentDataWin()
 {
 
     ImGui::Begin("Data");
-    ImGui::Image((void *)(intptr_t)t.txID, ImVec2(t.width, t.height)); 
 
 
     ImGui::Text("Path to load data folder from");
@@ -177,7 +176,14 @@ void NNGUI::presentDataWin()
         }
         else
         {
-            loadedSet = datLoad.loadAll();
+            loadedSet = datLoad.loadAll(); //Load dataset from folder
+            if(datLoad.inputType == dataLoader::dataTypes::image)
+            {
+                for(auto& img : loadedSet)
+                {
+                    displayedImages.push_back(image(img.first, datLoad.w, datLoad.h));
+                }
+            }
 
             statusString = "Loaded " + std::to_string(datLoad.dataNum) + " data samples from folder";
         }
@@ -194,8 +200,7 @@ void NNGUI::presentDataWin()
             {
                 if(datLoad.inputType == dataLoader::dataTypes::image) //Display image if the input is an image
                 {
-                    //displayedImg = image(loadedSet[i].first, datLoad.w, datLoad.h);
-                    //ImGui::Image((ImTextureID)displayedImg.txID, ImVec2(displayedImg.width, displayedImg.height));
+                    ImGui::Image((void *)(intptr_t)displayedImages[i].txID, ImVec2(displayedImages[i].width, displayedImages[i].height));
                 }
 
                 for(size_t j = 0; j < neuralNet.layers.back().size; ++j) //Display all neuron outputs
@@ -283,6 +288,8 @@ void NNGUI::drawNN()
     ImGui::Text(statusString.c_str()); //Display whatever message we have
 
     ImGui::EndMainMenuBar();
+
+
     
     this->presentCreateWin();
     this->presentTrainWin();

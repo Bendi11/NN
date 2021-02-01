@@ -30,13 +30,14 @@ struct image //Convenience class for displaying images in Dear ImGui windows
 
     image::image(std::string path)
     {
-        unsigned char* imgData = stbi_load(path.c_str(), &width, &height, &channels, 4);
-        logFile.write((char *)imgData, width * height * channels);
+        unsigned char* imgData = stbi_load(path.c_str(), &width, &height, NULL, 4);
         if(imgData == NULL) exit(-1);
         glGenTextures(1, &txID);
         glBindTexture(GL_TEXTURE_2D, txID);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
@@ -45,11 +46,17 @@ struct image //Convenience class for displaying images in Dear ImGui windows
 
     image(const std::vector<float> imgDat, int w, int h)
     {
+        width = w;
+        height = h;
         glGenTextures(1, &txID);
         glBindTexture(GL_TEXTURE_2D, txID);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, (void *)imgDat.data());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, imgDat.data());
     }
 
     image() 
@@ -61,7 +68,7 @@ struct image //Convenience class for displaying images in Dear ImGui windows
 
     ~image() //Destructor to clean up resources
     {
-        glDeleteTextures(1, &txID);
+
     }
 };
 
@@ -81,7 +88,7 @@ public:
     void presentDataWin(); //Function to display data loading from folder with manifest.json
     
     void drawNN();           //Function to draw all windows
-    NNGUI() {t = image("data/non0.jpg");}
+    NNGUI() { }
 
 private:
     net neuralNet; //Internal neural network object
@@ -91,7 +98,7 @@ private:
     dataLoader::dataSet loadedSet; //The loaded training data
     std::future<void> future; //If a thread is running a task currently
 
-    image t; //USELESS FUCKING DEBUG SHIT FUCK FUCK FUCKFUCKFUCK
+    std::vector<image> displayedImages; //All input images if the input is an image
 
 };
 
