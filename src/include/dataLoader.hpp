@@ -40,7 +40,8 @@ public:
     std::string error;     //The error string
     json manifest;         //The manifest.json object in C++
 
-
+    int w, h, ch; //All image sizes
+    
     dataTypes inputType;
     dataTypes outputType;
 

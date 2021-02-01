@@ -69,7 +69,6 @@ const dataLoader::dataPoint dataLoader::loadSingleData(const unsigned int index)
     {
         case dataTypes::image:
         {
-            int w, h, ch; //Image size and channel markers
             std::string fName = m_path; //We heven't changed dirs, so load dir name before file
             fName += manifest["data"][index]["input"]; //Get input file name
 
@@ -94,7 +93,6 @@ const dataLoader::dataPoint dataLoader::loadSingleData(const unsigned int index)
     {
         case dataTypes::image:
         {
-            int w, h, ch; //Image size and channel markers
             std::string fName = m_path; //We heven't changed dirs, so load dir name before file
             fName += manifest["data"][index]["output"]; //Get input file name
 
@@ -129,7 +127,7 @@ const dataLoader::dataSet dataLoader::loadAll()
         {
             ret.push_back(loadSingleData(i)); //Add the data to our data set
         }
-        catch(const std::exception& e)
+        catch(...)
         {
             
         }

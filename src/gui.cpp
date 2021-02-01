@@ -8,34 +8,6 @@ std::ofstream logFile;
 namespace GUI
 {
 
-struct image //Convenience class for displaying images in Dear ImGui windows
-{
-    GLuint txID; //Texture ID in OpenGL
-    int width; //Filled when image is loaded
-    int height;
-    int channels;
-
-    image::image(std::string path)
-    {
-        float* imgData = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
-        glGenTextures(1, &txID);
-        glBindTexture(GL_TEXTURE_2D, txID);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void *)imgData);
-        stbi_image_free(imgData);
-    }
-
-    image()
-    {
-
-    }
-
-    ~image() //Destructor to clean up resources
-    {
-        glDeleteTextures(1, &txID);
-    }
-};
 
 SDL_Window* window = NULL; 
 SDL_GLContext glContext;
@@ -188,8 +160,10 @@ void NNGUI::presentCreateWin()
 
 void NNGUI::presentDataWin()
 {
-    static image displayedImg;
+
     ImGui::Begin("Data");
+    ImGui::Image((void *)(intptr_t)t.txID, ImVec2(t.width, t.height)); 
+
 
     ImGui::Text("Path to load data folder from");
     static std::string dataPath; //Persistent string holding the folder with manifest.json
@@ -220,8 +194,8 @@ void NNGUI::presentDataWin()
             {
                 if(datLoad.inputType == dataLoader::dataTypes::image) //Display image if the input is an image
                 {
-                    displayedImg = image(datLoad.manifest["data"][i]["input"].get<std::string>());
-                    ImGui::Image((ImTextureID)displayedImg.txID, ImVec2(displayedImg.width, displayedImg.height));
+                    //displayedImg = image(loadedSet[i].first, datLoad.w, datLoad.h);
+                    //ImGui::Image((ImTextureID)displayedImg.txID, ImVec2(displayedImg.width, displayedImg.height));
                 }
 
                 for(size_t j = 0; j < neuralNet.layers.back().size; ++j) //Display all neuron outputs

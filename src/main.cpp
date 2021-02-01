@@ -13,6 +13,7 @@ set trainingData;
 int main(int argc, char* argv[])
 {
     GUI::initScreen(1280, 720);
+    
     SDL_Event e;
     ImGuiIO io = ImGui::GetIO();
     ImVec4 clear_color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -60,6 +61,7 @@ int main(int argc, char* argv[])
         SDL_GL_SwapWindow(GUI::window);
     }
 
+    /*
     int w;
     int h;
     int ch; 
@@ -89,7 +91,7 @@ int main(int argc, char* argv[])
     stbi_image_free(imgDat);
     imgDat = stbi_loadf("./non3.jpg", &w, &h, &ch, STBI_rgb);
     trainingData.push_back( std::make_pair<std::vector<float>, std::vector<float> >(std::vector<float>(imgDat, imgDat + (w * h * ch) ) , {0.0f} ) );
-    stbi_image_free(imgDat);
+    stbi_image_free(imgDat); */
 
 
 
