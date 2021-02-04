@@ -13,12 +13,12 @@ struct layer //General layer class containing neurons and weights
 {
 public:
     layer(size_t numIn, size_t numOut); //Constructor to make a new neural network with specified dimensions
-    layer(std::ifstream& file); //Constructor for loading a layer from a file
+    layer(FILE* file); //Constructor for loading a layer from a file
     void propFW(const layer& prev); //Function to calculate the outputs of layer based on input
     void calcOutputGradients(const std::vector<float>& expected); //Function to calculate neuron gradients if this is the output layer
     void calcHiddenGradients(const layer& next); //Function to calculate gradients of a hidden network layer
     void updateWeights(const layer& next); //Function to update weights based on calculated gradients
-    void write(std::ofstream& fStream); //Function to write a network to a file
+    void write(FILE* fStream); //Function to write a network to a file
 
     std::vector<float> outs;
     std::vector<float> bias;

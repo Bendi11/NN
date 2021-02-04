@@ -1,4 +1,70 @@
-#include "include/net.hpp"
+/*
+Single file include for neural network library
+To use, #include header in .hpp and .cpp files, and in ONE .cpp file, #define NN_IMPLEMENTATION before #include'ing the file
+
+*/
+
+#ifndef _NN_INCLUDE_
+#define _NN_INCLUDE_
+
+#include <vector>
+#include <iostream>
+#include <random>
+#include <fstream>
+
+extern std::ofstream logFile; //Yucky global variable but I need it to have a consistent log file
+
+typedef std::vector<std::pair<std::vector<float>, std::vector<float> > > set; //Ease of use type definitions with key value pairs
+
+struct layer //General layer class containing neurons and weights
+{
+public:
+    layer(size_t numIn, size_t numOut); //Constructor to make a new neural network with specified dimensions
+    layer(std::ifstream& file); //Constructor for loading a layer from a file
+    void propFW(const layer& prev); //Function to calculate the outputs of layer based on input
+    void calcOutputGradients(const std::vector<float>& expected); //Function to calculate neuron gradients if this is the output layer
+    void calcHiddenGradients(const layer& next); //Function to calculate gradients of a hidden network layer
+    void updateWeights(const layer& next); //Function to update weights based on calculated gradients
+    void write(std::ofstream& fStream); //Function to write a network to a file
+
+    std::vector<float> outs;
+    std::vector<float> bias;
+    std::vector<float> gradients;
+    std::vector< std::vector<float> > weights;
+    size_t size; //The number of numbers in the layer
+    static float LR; //Learning rate of the entire network
+
+};
+
+class net
+{
+public:
+    net(std::string fNames); //Constructor to load a NN from a file
+    static void load(net* in, std::string fName); //Function to load a NN from a file
+    static void save(net* in, std::string fName); //Async function to save a NN to a file
+    net() {numLays = 0;} //Default constructor
+
+    void addLayer(unsigned int numOuts, unsigned int numIn = 0); //Function to add a layer to the network
+    void train(const set& in, int iterations = 1); //Convenience function to load a training set and train on it
+    layer& getOut(); //Function returning network outputs
+    void write(std::string path); //Function to write a neural network to a file
+
+    void propFW(const std::vector<float>& in); //Function to propogate input data through the network
+    void backProp(const std::vector<float>& expected); //Function to update weights based on expected outputs
+
+    size_t numLays; //The number of layers in network
+    float MSE; //MSE calculated in train() function
+    std::vector<layer> layers; //The layout of the network
+
+
+private:
+
+};
+
+#endif //_NN_INCLUDE_
+
+#ifdef NN_IMPLEMENTATION //.cpp mode
+
 #include <assert.h>
 #include <string>
 
@@ -221,94 +287,69 @@ void net::train(const set& in, int iterations)
     MSE /= s * iterations; 
 }
 
-void layer::write(FILE* file)
+void layer::write(std::ofstream& fStream)
 {
-    //fStream << LR << ' ' << size << ' ';; //Write metadata about layer
-    fwrite((char* )&LR, sizeof(float), 1, file); //Write neural network learning rate
-    fwrite((char *)&size, sizeof(size_t), 1, file); //Write neural network size
+    fStream << LR << ' ' << size << ' ';; //Write metadata about layer
 
     for(auto& out : outs)
     {
-        //fStream << out << ' ';
-        fwrite((char *)&out, sizeof(float), 1, file);
+        fStream << out << ' ';
     }
 
     for(auto& b : bias)
     {
-        //fStream << b << ' ';
-        fwrite((char *)&b, sizeof(float), 1, file);
+        fStream << b << ' ';
     }
 
     for(auto& grad : gradients)
     {
-        //fStream << grad << ' ';
-        fwrite((char *)&grad, sizeof(float), 1, file);
+        fStream << grad << ' ';
     }
 
-    //fStream << weights[0].size() << ' '; //Write total size of weights matrix and size of each vector inside each vector
-    size_t inSize = weights[0].size();
-    fwrite((char *)&inSize, sizeof(size_t), 1, file);
+    fStream << weights[0].size() << ' '; //Write total size of weights matrix and size of each vector inside each vector
 
     for(unsigned i = 0; i < size; ++i) //For every weight...
     {
         for(auto& w : weights[i])
         {
-            //fStream << w << ' ';
-            fwrite((char *)&w, sizeof(float), 1, file);
+            fStream << w << ' ';
         }
     }
 }
 
 void net::write(std::string path)
 {
-    //std::ofstream writer; //Open the file in binary mode
-    //writer.open(path, std::ios::binary);
-    FILE* writer = fopen(path.c_str(), "wb");
-    if(writer == NULL) //File failed to open
+    std::ofstream writer; //Open the file in binary mode
+    writer.open(path);
+    if(!writer.is_open()) //File failed to open
     {
-        #ifdef _DEBUG_
         logFile << "Error: Failed to open NN file at " << path << std::endl;
-        #endif
         return; //Don't exit program, but exit the function to write to file
     }
-    #ifdef _DEBUG_
-    logFile << "Opened NN file at " << path << std::endl;
-    #endif
     
     unsigned i = 0; //Only used to give progress bar indication
     for(auto& lay : layers)
     {
-        #ifdef _DEBUG_
-        logFile << "Writing layer #" << i << " to file..."<< std::endl;
-        #endif
         lay.write(writer);
-        if(i != numLays - 1) fwrite("B", sizeof(char), 1, writer);     //Write layer separator character   
+        if(i != numLays - 1) writer << " B ";     //Write layer separator character   
         i++;
 
-        //writer.flush();
-        #ifdef _DEBUG_
-        logFile << "Wrote layer #" << i << " to file!"<< std::endl;
-        #endif
-
     }
-    fwrite("E", sizeof(char), 1, writer); //Write E to signify there are no more layers left
-    fclose(writer);
-    //writer.close();
+    writer << " E"; //Write E to signify there are no more layers left
+    writer.close();
 }
 
-layer::layer(FILE* file)
+layer::layer(std::ifstream& file)
 {
     size_t s; //Size temporary variable
-    //file >> LR;
-    fread((char *)&LR, sizeof(float), 1, file);
-    //file >> size;
-    fread((char*)&size, sizeof(size_t), 1, file);
+    file >> LR;
+    file >> size;
 
     outs.reserve(size); //Allocate enough memory to hold entire output vector
     for(unsigned i = 0; i < size; ++i)
     {
         float f;
-        fread((char *)&f, sizeof(float), 1, file);
+        file >> f;
         outs.push_back(f); 
     }
 
@@ -316,7 +357,7 @@ layer::layer(FILE* file)
     for(unsigned i = 0; i < size; ++i)
     {
         float f;
-        fread((char *)&f, sizeof(float), 1, file);
+        file >> f;
         bias.push_back(f);
     }
 
@@ -324,21 +365,19 @@ layer::layer(FILE* file)
     for(unsigned i = 0; i < size; ++i)
     {
         float f;
-        fread((char *)&LR, sizeof(float), 1, file);
+        file >> f;
         gradients.push_back(f);
     }
 
-    //file >> s; //Get number of inputs to network
-    fread((char *)&s, sizeof(size_t), 1, file);
+    file >> s; //Get number of inputs to network
     weights.resize(size);
 
     for(unsigned i = 0; i < size; ++i) //For every weight...
     {
-        weights[i].reserve(s);
         for(unsigned j = 0; j < s; ++j) //For every input...
         {
             float f;
-            fread((char *)&f, sizeof(float), 1, file);
+            file >> f;
             weights[i].push_back(f);
         }
     }
@@ -354,36 +393,30 @@ layer::layer(FILE* file)
 
 net::net(std::string fName) //Constructor to load a NN from one file
 {
-    //std::ifstream reader(fName, std::ios::binary); //Reader file object for reading all neural network layers
-    FILE* reader = fopen(fName.c_str(), "rb");
-    if(reader == NULL)
+    std::ifstream reader(fName); //Reader file object for reading all neural network layers
+    if(!reader.is_open())
     {
-        #ifdef _DEBUG_
         logFile << "Failed to open NN file from " << fName << std::endl;
-        #endif
         exit(-1);
     }
     size_t i = 0; //Count of layers loaded
 
-    while(!feof(reader))
+    while(!reader.eof() )
     {
         i++;
 
         #ifdef _DEBUG_
-        logFile << "Reading layer from file: " << fName << std::endl;
+        logFile << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
         #endif
 
-        if(feof(reader))
+        if(!reader.is_open())
         {
             break;
         }
         layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
-        #ifdef _DEBUG_
         logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
-        #endif
         char c;
-        //reader >> c;
-        fread((char *)&c, sizeof(char), 1, reader);
+        reader >> c;
         if(c == 'E') //End of file
         {
             break;
@@ -391,6 +424,66 @@ net::net(std::string fName) //Constructor to load a NN from one file
 
     }
     numLays = layers.size();
-    fclose(reader);
-    //reader.close();
+    reader.close();
 }
+
+void net::load(net* in, std::string fName) //Same as constructor, but taking argument instead
+{
+    std::ifstream reader(fName); //Reader file object for reading all neural network layers
+    if(!reader.is_open())
+    {
+        logFile << "Failed to open NN file from " << fName << std::endl;
+        return;
+    }
+    size_t i = 0; //Count of layers loaded
+
+    while(!reader.eof() )
+    {
+        i++;
+
+        #ifdef _DEBUG_
+        logFile << "Reading layer from file: " << fNames + std::to_string(i) + ".NN" << std::endl;
+        #endif
+
+        if(!reader.is_open())
+        {
+            break;
+        }
+        in->layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
+        logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
+        char c;
+        reader >> c;
+        if(c == 'E') //End of file
+        {
+            break;
+        }
+
+    }
+    in->numLays = in->layers.size();
+    logFile << in->numLays << std::endl;
+    reader.close();
+}
+
+void net::save(net* in, std::string fName) //
+{
+    std::ofstream writer; //Open the file in binary mode
+    writer.open(fName);
+    if(!writer.is_open()) //File failed to open
+    {
+        logFile << "Error: Failed to open NN file at " << fName << std::endl;
+        return; //Don't exit program, but exit the function to write to file
+    }
+    
+    unsigned i = 0; //Only used to give progress bar indication
+    for(auto& lay : in->layers)
+    {
+        lay.write(writer);
+        if(i != in->numLays - 1) writer << " B ";     //Write layer separator character   
+        i++;
+
+    }
+    writer << " E"; //Write E to signify there are no more layers left
+    writer.close();
+}
+
+#endif
