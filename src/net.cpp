@@ -8,27 +8,14 @@ float layer::LR = 0.005f; //Default 0.005f
 
 //#define _DEBUG_
 
-float dot(const std::vector<float>& v1, const std::vector<float>& v2) //Function to take dot product of two vectors
-{
-    assert(v1.size() == v2.size()); //Crash program if the vectors are somehow incorrectly sized
-
-    float out = 0.0f; //The return value of the function
-    size_t len = v1.size(); //Get total size of the vectors
-    for(unsigned i = 0; i < len; ++i) //Iterate through each element of vectors
-    {
-        out += v1[i] * v2[i]; //Multiply elements and add to total
-    }
-    return out;   
-}
-
-float sig(float x)
+float sig(float x) //Default activation function for neural network
 {
     return 1 / (1 + std::exp(-x));
 
     //return tanhf(x);
 }
 
-float sig_d(float x)
+float sig_d(float x) //Derviative of sigmoid activation used to train network
 {
     return x * (1 - x);
 
@@ -42,21 +29,21 @@ layer::layer(size_t numIn, size_t numOut) : size(numOut) //Function to construct
     bias.resize(size, 0.5f);
     weights.resize(size);
 
-    for(auto &w : weights) 
+    for(auto &w : weights) //For every neuron weight vector...
     {
-        w.resize(numIn);
+        w.resize(numIn); //Resize the vector to accomodate all inputs
         for(auto &w2 : w)
         {
-            w2 = ( ( (float)rand() / float(RAND_MAX) ) - 0.5f);
+            w2 = ( ( (float)rand() / float(RAND_MAX) ) - 0.5f); //Set every weight to a random value between 0.5 and 1
         }
     }
 }
 
 void layer::propFW(const layer& prev) //Function to calculate outputs based on layer inputs
 {
-    for(unsigned i = 0; i < size; ++i)
+    for(unsigned i = 0; i < size; ++i) //For every neuron in this layer...
     {
-        float cache = 0.0f;
+        float cache = 0.0f; //Cache used to sum up product of weights and inputs before activation function
         size_t psize = prev.outs.size(); //Get size once to avoid needing to get it every for loop iteration
         for(unsigned j = 0; j < psize; ++j) //For every input...
         {
@@ -71,9 +58,9 @@ void layer::calcOutputGradients(const std::vector<float>& expected) //Function t
 {
     assert(expected.size() == outs.size()); //Ensure that the sizes of both vectors match
 
-    for(unsigned i = 0; i < size; ++i)
+    for(unsigned i = 0; i < size; ++i) //For every output neuron...
     {
-        float delta = -(expected[i] - outs[i]);
+        float delta = -(expected[i] - outs[i]); //Get error of the output neurons using expected data
        
         gradients[i] = delta * sig_d(outs[i]);
 
@@ -88,7 +75,7 @@ void layer::calcHiddenGradients(const layer& next) //Function to calculate hidde
     float sum = 0.0f;
     for(unsigned i = 0; i < size; ++i) //Iterate over all of our neurons
     {
-        sum = 0.0;
+        sum = 0.0; //Used to do dot product of next gradient and next weights
 
         for(unsigned n = 0; n < next.size; ++n) //For each neuron this neuron feeds in the next layer
         {
@@ -103,11 +90,11 @@ void layer::updateWeights(const layer& prev) //Function to update weights based 
 {
     for(unsigned i = 0; i < size; ++i) //For every neuron in this layer...
     {
-        bias[i] -= gradients[i];
+        bias[i] -= gradients[i]; //Adjust bias based on gradient
 
         for(unsigned j = 0; j < prev.size; ++j) //For every neuron in the previous layer
         {
-            float delta = LR * prev.outs[j] * gradients[i]; 
+            float delta = LR * prev.outs[j] * gradients[i]; //TODO: add momentum if specified by user
             weights[i][j] -= delta;
         }
     }
@@ -115,9 +102,9 @@ void layer::updateWeights(const layer& prev) //Function to update weights based 
 
 void net::addLayer(unsigned int numOuts, unsigned int numIn) //Function to add a layer to the network
 {
-    if(layers.size() == 0)
+    if(layers.size() == 0) //This is the first layer added
     {
-        layers.push_back(layer(numIn, numOuts));
+        layers.push_back(layer(numIn, numOuts)); //Can't call layers.back() if it is empty, so I need a special case
         numLays = 1;
         return;
     }
@@ -134,9 +121,9 @@ void net::addLayer(unsigned int numOuts, unsigned int numIn) //Function to add a
 
 void net::propFW(const std::vector<float>& in) //Function to propogate data through the network
 {
-    assert(layers.size() > 1);
+    assert(layers.size() > 1); //Take out for debug?
 
-    for(unsigned s = 0; s < in.size(); ++s)
+    for(unsigned s = 0; s < in.size(); ++s) //For every neuron in input layer, assign value of input to output of neuron. memcpy might be faster?
     {
         layers[0].outs[s] = in[s];
 
@@ -144,7 +131,7 @@ void net::propFW(const std::vector<float>& in) //Function to propogate data thro
 
     for(unsigned i = 1; i < numLays; ++i) //For the next layers in the network...
     {
-        layers[i].propFW(layers[i - 1]);
+        layers[i].propFW(layers[i - 1]); //Propogate FW based on previous layer's output
     }
 
 }
@@ -165,34 +152,20 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
     logFile << "OUTPUT LAYER " << std::endl;
     #endif
 
-    layers[layers.size() - 1].calcOutputGradients(expected);
+    layers[layers.size() - 1].calcOutputGradients(expected); //Get the output gradients first
 
-    for(size_t i = numLays - 2; i > 0; i--)
+    for(size_t i = numLays - 2; i > 0; i--) //Start from first hidden layer from output layer work to the input layer
     {
         #ifdef _DEBUG_
         logFile << "LAYER " << i << std::endl;
         #endif
-        layers[i].calcHiddenGradients(layers[i + 1]);
+        layers[i].calcHiddenGradients(layers[i + 1]); //Get the gradient of this layer
 
         
     }       
-    for(size_t i = numLays - 1; i > 0; --i)
+    for(size_t i = numLays - 1; i > 0; --i) //From output layer to input, adjust weights based on calculated gradients
     {
-        #ifdef _DEBUG_
-        if(i == numLays - 1)
-        {
-            logFile << "OUTPUT LAYER: " << std::endl;    
-        }
-        #endif
-
         layers[i].updateWeights(layers[i - 1]);
-
-        #ifdef _DEBUG_
-        if(i == numLays - 1)
-        {
-            logFile << "END OUTPUT LAYER: " << std::endl;
-        }
-        #endif
     }
 
     #ifdef _DEBUG_
@@ -201,7 +174,7 @@ void net::backProp(const std::vector<float>& expected) //Function to backpropoga
     #endif
 }
 
-void net::train(const set& in, int iterations)
+void net::train(const set& in, int iterations) //Convenience function to train over dataset and get MSE
 {
     size_t s = in.size(); //Get size once 
     MSE = 0.0f; //Reset MSE before training
@@ -214,38 +187,33 @@ void net::train(const set& in, int iterations)
             
             for(unsigned k = 0; k < layers.back().size; ++k)
             {
-                MSE += pow(in[i].second[k] - layers.back().outs[k], 2);
+                MSE += pow(in[i].second[k] - layers.back().outs[k], 2); //Mean squared error
             }
         }
 
     MSE /= s * iterations; 
 }
 
-void layer::write(FILE* file)
+void layer::write(FILE* file) //Function to write layer to file using C style FILE for writing, might make x86 NN incompatible with x86_64 PC
 {
-    //fStream << LR << ' ' << size << ' ';; //Write metadata about layer
     fwrite((char* )&LR, sizeof(float), 1, file); //Write neural network learning rate
     fwrite((char *)&size, sizeof(size_t), 1, file); //Write neural network size
 
     for(auto& out : outs)
     {
-        //fStream << out << ' ';
         fwrite((char *)&out, sizeof(float), 1, file);
     }
 
     for(auto& b : bias)
     {
-        //fStream << b << ' ';
         fwrite((char *)&b, sizeof(float), 1, file);
     }
 
     for(auto& grad : gradients)
     {
-        //fStream << grad << ' ';
         fwrite((char *)&grad, sizeof(float), 1, file);
     }
 
-    //fStream << weights[0].size() << ' '; //Write total size of weights matrix and size of each vector inside each vector
     size_t inSize = weights[0].size();
     fwrite((char *)&inSize, sizeof(size_t), 1, file);
 
@@ -253,16 +221,13 @@ void layer::write(FILE* file)
     {
         for(auto& w : weights[i])
         {
-            //fStream << w << ' ';
             fwrite((char *)&w, sizeof(float), 1, file);
         }
     }
 }
 
-void net::write(std::string path)
+void net::write(std::string path) //Function to write entire NN to a file
 {
-    //std::ofstream writer; //Open the file in binary mode
-    //writer.open(path, std::ios::binary);
     FILE* writer = fopen(path.c_str(), "wb");
     if(writer == NULL) //File failed to open
     {
@@ -293,15 +258,12 @@ void net::write(std::string path)
     }
     fwrite("E", sizeof(char), 1, writer); //Write E to signify there are no more layers left
     fclose(writer);
-    //writer.close();
 }
 
-layer::layer(FILE* file)
+layer::layer(FILE* file) //Function to reconstruct a layer from a FILE object
 {
     size_t s; //Size temporary variable
-    //file >> LR;
     fread((char *)&LR, sizeof(float), 1, file);
-    //file >> size;
     fread((char*)&size, sizeof(size_t), 1, file);
 
     outs.reserve(size); //Allocate enough memory to hold entire output vector
@@ -328,7 +290,6 @@ layer::layer(FILE* file)
         gradients.push_back(f);
     }
 
-    //file >> s; //Get number of inputs to network
     fread((char *)&s, sizeof(size_t), 1, file);
     weights.resize(size);
 
@@ -354,7 +315,6 @@ layer::layer(FILE* file)
 
 net::net(std::string fName) //Constructor to load a NN from one file
 {
-    //std::ifstream reader(fName, std::ios::binary); //Reader file object for reading all neural network layers
     FILE* reader = fopen(fName.c_str(), "rb");
     if(reader == NULL)
     {
@@ -373,18 +333,19 @@ net::net(std::string fName) //Constructor to load a NN from one file
         logFile << "Reading layer from file: " << fName << std::endl;
         #endif
 
-        if(feof(reader))
+        if(feof(reader)) //Just in case we hit an unexpected EOF
         {
             break;
         }
+
         layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
         #ifdef _DEBUG_
         logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
         #endif
+
         char c;
-        //reader >> c;
         fread((char *)&c, sizeof(char), 1, reader);
-        if(c == 'E') //End of file
+        if(c == 'E') //End of file character
         {
             break;
         }
@@ -392,5 +353,4 @@ net::net(std::string fName) //Constructor to load a NN from one file
     }
     numLays = layers.size();
     fclose(reader);
-    //reader.close();
 }
