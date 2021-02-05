@@ -2,6 +2,9 @@
 #include <assert.h>
 #include <string>
 
+namespace neural
+{
+
 #define MAX(x, y) (x > y) ? x : y
 float layer::LR = 0.005f; //Default 0.005f
 
@@ -354,3 +357,5 @@ net::net(std::string fName) //Constructor to load a NN from one file
     numLays = layers.size();
     fclose(reader);
 }
+
+} //Namespace neural

@@ -5,6 +5,9 @@
 #include <random>
 #include <fstream>
 
+namespace neural
+{
+
 extern std::ofstream logFile; //Yucky global variable but I need it to have a consistent log file
 
 typedef std::vector<std::pair<std::vector<float>, std::vector<float> > > set; //Ease of use type definitions with key value pairs
@@ -53,3 +56,5 @@ public:
 private:
 
 };
+
+} //Namespace neural
