@@ -17,7 +17,7 @@ include_directories(
     "src/include"
     "third-party/json/include"
     ${CMAKE_SOURCE_DIR}
-    ${Curses_INCLUDE_DIR}
+    ${CURSES_INCLUDE_DIR}
     "${CMAKE_SOURCE_DIR}/src/include"
 )
 
@@ -25,6 +25,7 @@ set(SOURCES
     "src/main.cpp"
     "src/net.cpp"
     "src/dataLoader.cpp"
+    "src/cli.cpp"
 )
 
 if(WIN32)
@@ -44,6 +45,6 @@ find_library(PDC_LIBS pdcurses REQUIRED)
 target_include_directories(${CMAKE_PROJECT_NAME} ${PDC_INCLUDES})
 target_link_libraries(${CMAKE_PROJECT_NAME} ${PDC_LIBS})
 else()
-target_link_libraries(${CMAKE_PROJECT_NAME} ${Curses_LIBRARIES})
+target_link_libraries(${CMAKE_PROJECT_NAME} ${CURSES_LIBRARIES})
 endif()
 
