@@ -1,9 +1,9 @@
 #pragma once
 
 #ifdef _WIN32
-#include <pcurses/curses.h>
+#include <curses.h>
 #else //*nix or mac 
-#include <ncurses.h>
+#include <curses.h>
 #endif
 
 #include "net.hpp"
@@ -34,5 +34,5 @@ private:
     void mainMenu(void); //Create, edit, load, etc.
 
     int MAX_ROWS;
-    MAX_COLS;
+    int MAX_COLS;
 };
