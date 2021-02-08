@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
@@ -17,13 +17,12 @@ target_include_directories( libNeural
 )
 
 
-project(NN)
+project(NN-Manager)
 
 include_directories(
     "src/manager/include"
     "third-party/json/include"
     ${CMAKE_SOURCE_DIR}
-    ${CURSES_INCLUDE_DIR}
     "${CMAKE_SOURCE_DIR}/src/manager/include"
 )
 
@@ -55,3 +54,5 @@ find_library(Curses REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CURSES_LIBRARIES})
 
 endif()
+
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "NN_Manage")

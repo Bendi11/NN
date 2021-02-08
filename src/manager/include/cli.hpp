@@ -1,10 +1,5 @@
 #pragma once
-
-#ifdef _WIN32
 #include <curses.h>
-#else //*nix or mac 
-#include <curses.h>
-#endif
 
 #include "net.hpp"
 
@@ -14,7 +9,7 @@ public:
     NNView(void);       //Constructor to setup curses stuff
     ~NNView(void);      //Need explicit destructor to call curses shutdown functions
 
-    bool refresh(void); //Function to be ran in main loop
+    bool display(void); //Function to be ran in main loop
 
     bool bRun = true; //Set to false if the program should exit
 private:
