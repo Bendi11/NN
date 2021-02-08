@@ -32,7 +32,7 @@ public:
 
 };
 
-class net
+class net //Neural network class
 {
 public:
     net(std::string fNames); //Constructor to load a NN from a file

@@ -190,7 +190,7 @@ void net::train(const set& in, int iterations) //Convenience function to train o
             
             for(unsigned k = 0; k < layers.back().size; ++k)
             {
-                MSE += pow(in[i].second[k] - layers.back().outs[k], 2); //Mean squared error
+                MSE += (float)pow(in[i].second[k] - layers.back().outs[k], 2); //Mean squared error
             }
         }
 

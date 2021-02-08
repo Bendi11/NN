@@ -1,36 +1,40 @@
 cmake_minimum_required(VERSION 3.10)
-include(FetchContent) #For JSON fetching from git repo
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}) #For FindSDL2.cmake
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-if(WIN32)
-include("E:\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake") #Find vcpkg script
-endif()
+
+set(libSOURCES
+    "src/neural/net.cpp"
+)
+
+add_library(libNeural ${libSOURCES}) #Add Neural network library
+
+target_include_directories( libNeural
+    PUBLIC
+    "src/neural/include"
+)
+
 
 project(NN)
 
-find_package(Curses REQUIRED)
-
-
 include_directories(
-    "src/include"
+    "src/manager/include"
     "third-party/json/include"
     ${CMAKE_SOURCE_DIR}
     ${CURSES_INCLUDE_DIR}
-    "${CMAKE_SOURCE_DIR}/src/include"
+    "${CMAKE_SOURCE_DIR}/src/manager/include"
 )
 
 set(SOURCES 
-    "src/main.cpp"
-    "src/net.cpp"
-    "src/dataLoader.cpp"
-    "src/cli.cpp"
+    "src/manager/main.cpp"
+    "src/manager/dataLoader.cpp"
+    "src/manager/cli.cpp"
 )
 
 if(WIN32)
     STRING(REPLACE "/Od" "/O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})    
-    # add_link_options("/subsystem:windows")
     add_link_options("/nodefaultlib:msvcrt.lib")
 endif()
 
@@ -38,13 +42,16 @@ endif()
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 
-if(WIN32)
-find_path(PDC_INCLUDES curses.h)
-find_library(PDC_LIBS pdcurses REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE libNeural)
 
-target_include_directories(${CMAKE_PROJECT_NAME} ${PDC_INCLUDES})
-target_link_libraries(${CMAKE_PROJECT_NAME} ${PDC_LIBS})
-else()
+if(WIN32) #Build PDCurses on windows
+
+add_subdirectory(third-party/PDCurses-3.8) #Build and link PDcurses using the cmakelists.txt file
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE PDcurses)
+
+else() #Use Ncurses on *nixes
+
+find_library(Curses REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${CURSES_LIBRARIES})
-endif()
 
+endif()
