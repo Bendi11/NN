@@ -3,7 +3,7 @@ A neural network framework made from scratch in C++. It is pretty incomplete and
 like Tensorflow, OpenNN, etc.
 
 ## Features
-- GUI based neural network management
+- CLI based neural network management
 - Saving / loading neural networks to a file
 - Easy image loading using a manifest file in a data folder
 
@@ -13,5 +13,5 @@ like Tensorflow, OpenNN, etc.
 - Multithreading
 
 ## Using As a Library
-This can be used standalone in a project, just as a library. Copy the files src/include/net.hpp and src/net.cpp to your project 
-and #include the header file, you should be good to go.
+This can be used standalone in a project, just as a library. Copy the folder src/neural to your project 
+and in a cmakelists.txt file, use add_subdirectory(neural) and link_libraries(libNeural)
