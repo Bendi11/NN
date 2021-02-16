@@ -17,8 +17,8 @@ set(SOURCES
 )
 
 if(WIN32)
-    STRING(REPLACE "/Od" "/O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})    
-    add_link_options("/nodefaultlib:msvcrt.lib")
+    #STRING(REPLACE "/Od" "/O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})    
+    #add_link_options("/nodefaultlib:msvcrt.lib")
 endif()
 
 
@@ -32,7 +32,6 @@ add_subdirectory(third-party/imgui)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imgui)
 
 if(UNIX)
-
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl)
 endif()
 

@@ -6,6 +6,7 @@ endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 find_package(SDL2 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 add_library(imgui 
     imconfig.h
@@ -32,4 +33,4 @@ target_include_directories(imgui PUBLIC
     ${SDL2_INCLUDE_DIRS}
 )
 
-target_link_libraries(imgui PUBLIC SDL2::SDL2main SDL2::SDL2)
+target_link_libraries(imgui PUBLIC SDL2::SDL2main SDL2::SDL2 ${OPENGL_gl_LIBRARY})

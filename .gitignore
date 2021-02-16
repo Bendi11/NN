@@ -18,3 +18,4 @@ NN
 lib
 NN-Builder
 *.dll
+*.exe.manifest
