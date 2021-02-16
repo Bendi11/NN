@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_MODULE_PATH .) # For FindSDL2.cmake
+
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE) #If vcpkg.cmake is used, don't use findSDL2.cmake
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}) # For FindSDL2.cmake
+endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 find_package(SDL2 REQUIRED)
@@ -22,11 +25,11 @@ add_library(imgui
 )
 
 target_include_directories(imgui PUBLIC 
-    "backends",
+    "backends"
     "."
     "third-party/imgui"
     "glad/include"
     ${SDL2_INCLUDE_DIRS}
 )
 
-target_link_libraries(imgui PRIVATE ${SDL2_LIBRARIES} )
+target_link_libraries(imgui PUBLIC SDL2::SDL2main SDL2::SDL2)
