@@ -23,10 +23,10 @@ public:
     void updateWeights(const layer& next); //Function to update weights based on calculated gradients
     void write(FILE* fStream); //Function to write a network to a file
 
-    std::vector<float> outs;
-    std::vector<float> bias;
-    std::vector<float> gradients;
-    std::vector< std::vector<float> > weights;
+    std::vector<float> outs; ///Activated output values
+    std::vector<float> bias; ///Bias values for each neuron
+    std::vector<float> gradients; ///Gradient in each neuron
+    std::vector< std::vector<float> > weights; ///A vector of vectors, one input weight vector for every neuron
     size_t size; //The number of numbers in the layer
     static float LR; //Learning rate of the entire network
 

@@ -29,7 +29,6 @@ include_directories(
 set(SOURCES 
     "src/manager/main.cpp"
     "src/manager/dataLoader.cpp"
-    "src/manager/cli.cpp"
 )
 
 if(WIN32)
@@ -43,16 +42,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE libNeural)
 
-if(WIN32) #Build PDCurses on windows
-
-add_subdirectory(third-party/PDCurses-3.8) #Build and link PDcurses using the cmakelists.txt file
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE PDcurses)
-
-else() #Use Ncurses on *nixes
-
-find_library(Curses REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} ${CURSES_LIBRARIES})
-
-endif()
+add_subdirectory(third-party/imgui)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imgui)
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "NN_Manage")
