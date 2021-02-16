@@ -1,34 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-
-set(libSOURCES
-    "src/neural/net.cpp"
-)
-
-add_library(libNeural ${libSOURCES}) #Add Neural network library
-
-target_include_directories( libNeural
-    PUBLIC
-    "src/neural/include"
-)
-
-
-project(NN-Manager)
+project(NN-Builder)
 
 include_directories(
-    "src/manager/include"
+    "builder/include"
     "third-party/json/include"
     ${CMAKE_SOURCE_DIR}
-    "${CMAKE_SOURCE_DIR}/src/manager/include"
+    "${CMAKE_SOURCE_DIR}/builder/include"
 )
 
 set(SOURCES 
-    "src/manager/main.cpp"
-    "src/manager/dataLoader.cpp"
+    "builder/main.cpp"
+    "builder/dataLoader.cpp"
 )
 
 if(WIN32)
@@ -40,9 +25,10 @@ endif()
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE libNeural)
+add_subdirectory(net)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE neural)
 
 add_subdirectory(third-party/imgui)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imgui)
 
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "NN_Manage")
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "NN-Builder")
