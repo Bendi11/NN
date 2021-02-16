@@ -6,7 +6,6 @@ find_package(SDL2 REQUIRED)
 
 add_library(imgui 
     imconfig.h
-    imgui_demo.cpp
     imgui_draw.cpp
     imgui_internal.h
     imgui_tables.cpp

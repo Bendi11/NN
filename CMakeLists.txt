@@ -31,4 +31,9 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE neural)
 add_subdirectory(third-party/imgui)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE imgui)
 
+if(UNIX)
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE dl)
+endif()
+
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "NN-Builder")
