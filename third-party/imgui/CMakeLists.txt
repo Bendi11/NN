@@ -9,6 +9,7 @@ find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 add_library(imgui 
+    imgui_stdlib.cpp
     imconfig.h
     imgui_draw.cpp
     imgui_internal.h

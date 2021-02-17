@@ -358,4 +358,46 @@ net::net(std::string fName) //Constructor to load a NN from one file
     fclose(reader);
 }
 
+void net::load(std::string fName) //Same as constructor, but to explicitly call without move semantics
+{
+    FILE* reader = fopen(fName.c_str(), "rb");
+    if(reader == NULL)
+    {
+        #ifdef _DEBUG_
+        logFile << "Failed to open NN file from " << fName << std::endl;
+        #endif
+        throw std::runtime_error("Failed to open neural network file!");
+    }
+    size_t i = 0; //Count of layers loaded
+
+    while(!feof(reader))
+    {
+        i++;
+
+        #ifdef _DEBUG_
+        logFile << "Reading layer from file: " << fName << std::endl;
+        #endif
+
+        if(feof(reader)) //Just in case we hit an unexpected EOF
+        {
+            break;
+        }
+
+        layers.push_back(layer(reader)); //Read the layer data from the file and add it to our layers
+        #ifdef _DEBUG_
+        logFile << "Layer #" << i << " loaded from file " << fName << std::endl;
+        #endif
+
+        char c;
+        fread((char *)&c, sizeof(char), 1, reader);
+        if(c == 'E') //End of file character
+        {
+            break;
+        }
+
+    }
+    numLays = layers.size();
+    fclose(reader);
+}
+
 } //Namespace neural

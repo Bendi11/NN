@@ -14,6 +14,7 @@ include_directories(
 set(SOURCES 
     "builder/main.cpp"
     "builder/dataLoader.cpp"
+    "builder/gui.cpp"
 )
 
 if(WIN32)

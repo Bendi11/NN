@@ -36,8 +36,7 @@ class net //Neural network class
 {
 public:
     net(std::string fNames); //Constructor to load a NN from a file
-    static void load(net* in, std::string fName); //Function to load a NN from a file
-    static void save(net* in, std::string fName); //Async function to save a NN to a file
+    void load(std::string fName); //Function to load a NN from a file
     net() {numLays = 0;} //Default constructor
 
     void addLayer(unsigned int numOuts, unsigned int numIn = 0); //Function to add a layer to the network

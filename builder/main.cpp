@@ -58,6 +58,8 @@ int main(int argc, char* argv[])
     ImGuiIO& guiIO = ImGui::GetIO();
     float FPS = 0.0f;
 
+    NNView nnv;
+
     bool run = true; //When user presses 'X' to exit
     while(run)
     {
@@ -72,7 +74,7 @@ int main(int argc, char* argv[])
         ImGui::NewFrame();
 
         
-
+        run = ( nnv.display() ) ? run : false;
         
 
         ImGui::Render();
