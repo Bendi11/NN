@@ -3,7 +3,7 @@ A neural network framework made from scratch in C++. It is pretty incomplete and
 like Tensorflow, OpenNN, etc.
 
 ## Features
-- CLI based neural network management
+- GUI based neural network management
 - Saving / loading neural networks to a file
 - Easy image loading using a manifest file in a data folder
 
