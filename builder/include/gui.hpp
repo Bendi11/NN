@@ -11,6 +11,7 @@
 #include <glad/glad.h>
 
 #include <net.hpp>
+#include "dataLoader.hpp"
 
 class NNView
 {
@@ -18,7 +19,12 @@ public:
 
     bool display(); //Function called every frame 
 
+    NNView();
+
 private:
+
+    dataLoader dataLoad; //The data loader object for loading training data
+    dataLoader::dataSet trainingData; //The vector of inputs and expected outputs
 
     neural::net NN; //Internal neural network object
     std::future<void> bgProcess; //Background process future object

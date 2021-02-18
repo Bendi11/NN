@@ -1,0 +1,12 @@
+{
+    "name": "Validation Set",
+    "inputType": "image",
+    "outputType": "number",
+    "data": 
+    [
+        {"input": "moon-og.jpg", "output": [1.0]},
+
+        {"input": "anno.jpg", "output": [0.0]}
+
+    ]
+}

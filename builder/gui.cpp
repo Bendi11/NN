@@ -58,7 +58,7 @@ void NNView::creationWin()
             }
             else
             {
-                if(ImGui::BeginMenu("Hidden Layer"))
+                if(ImGui::BeginMenu( ("Hidden Layer #" + std::to_string(enumerated) ).c_str() ) )
                 {
                     ImGui::Text("Input Number: %d", layer.weights[0].size()); //Display size of inputs
                     ImGui::Text("Output Number: %d", layer.size);
@@ -93,8 +93,27 @@ void NNView::trainWin()
 {
     ImGui::Begin("Neural Network Training");
 
-    ImGui::Text("Neural Network MSE: %d", NN.MSE); //Display mean squared error of network
+    ImGui::Text("Neural Network MSE: %f", NN.MSE); //Display mean squared error of network
+    ImGui::Text("Neural Network Learning Rate: ");
+    ImGui::InputFloat("LR: ", &neural::layer::LR, 0.0F, 0.0F, "%f"); //Input the learning rate
 
+    static int trainingIters = 1; //The number of iterations to train the neural network for
+    ImGui::Text("Number of Training Iterations: ");
+    ImGui::InputInt("", &trainingIters); //Get the number of iterations to train for
+
+    if(dataLoad.valid) //There is data loaded, we can train
+    {
+        ImGui::Text("Training Data Loaded!");
+        if(ImGui::Button("Train Neural Network Over Data"))
+        {
+            if(bgProcess.wait_for(std::chrono::seconds(0)) == std::future_status::ready) //If no background process is running...
+            {
+                processString = "Training over data for " + std::to_string(trainingIters) + " epochs";
+                bgProcess = std::async(std::launch::async, &neural::net::train, &NN, trainingData, trainingIters); //Spawn an async process to train
+            }
+        }
+    }
+    
     ImGui::End();
 }
 
@@ -108,16 +127,72 @@ void NNView::dataWin()
 
     if(ImGui::Button("Load Data Using Manifest.json"))
     {
-        
+        try
+        {
+            processString = "Loading Training Data From " + manifestPath;
+            if ( !dataLoad.parseFolder(manifestPath) )
+            {
+                statusString = dataLoad.error;
+                return;
+            }
+            trainingData = dataLoad.loadAll();
+        }
+        catch(const std::string& e)
+        {
+            statusString = e; //Set the error
+            exit(-1);
+        }
+    }
+
+    ImGui::Spacing();
+
+    if(dataLoad.valid) //If valid data is loaded...
+    {
+        ImGui::Text("Data Points: %d", dataLoad.dataNum); //Display size of dataset
+        ImGui::Text("Input Data Type: %s", DATATYPESTR(dataLoad.inputType) );
+        ImGui::Text("Output Data Type: %s", DATATYPESTR(dataLoad.outputType) );
+
+        size_t enumerate = 0;
+        for(auto& input : dataLoad.manifest["data"]) //For every data input...
+        {
+            if(ImGui::BeginMenu( ("Input: " + input["input"].get<std::string>()).c_str() ) ) //Begin a menu for this input
+            {
+                ImGui::Text("Neural Network Outputs: ");
+                for(const float& out : NN.getOut().outs)
+                {
+                    ImGui::Text("%f", out);
+                }
+                ImGui::Spacing();
+
+                if(ImGui::Button("See Neural Network Output For This Input"))
+                {
+                    if(bgProcess.wait_for(std::chrono::seconds(0)) == std::future_status::ready) //If no background process is running...
+                    {
+                        processString = "Propogating Data Forwards";
+                        bgProcess = std::async(std::launch::async, &neural::net::propFW, &NN, trainingData[enumerate].first); //Spawn an async process to train
+                    }
+                }
+
+                ImGui::EndMenu();
+            }
+            enumerate++;
+        }
     }
 
     ImGui::End();
 }
 
-bool NNView::display()
+NNView::NNView()
 {
     if(!bgProcess.valid()) //Do stupid stuff for std::future
         bgProcess = std::async(temp);
+}
+
+bool NNView::display()
+{
+    creationWin();
+    dataWin();
+    trainWin();
 
     ImGui::BeginMainMenuBar();
     if(ImGui::BeginMenu("Options") )
@@ -129,7 +204,6 @@ bool NNView::display()
         ImGui::EndMenu();
     }
 
-    ImGui::Text("%s", statusString.c_str());
 
 
     if(bgProcess.wait_for(std::chrono::seconds(0) ) == std::future_status::ready) //If the background process is done...
@@ -140,9 +214,10 @@ bool NNView::display()
     {
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Process: %s", processString.c_str());
     }
-    ImGui::EndMainMenuBar();
+    
+    ImGui::Text("%s", statusString.c_str());
 
-    creationWin();
+    ImGui::EndMainMenuBar();
 
     return true;
 }

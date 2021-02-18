@@ -19,7 +19,8 @@ set(SOURCES
 
 if(WIN32)
     #STRING(REPLACE "/Od" "/O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})    
-    #add_link_options("/nodefaultlib:msvcrt.lib")
+    add_link_options("/subsystem:windows")
+    # add_link_options("nodefaultlib::msvcrt.lib")
 endif()
 
 

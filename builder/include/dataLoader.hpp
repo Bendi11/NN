@@ -19,6 +19,8 @@ numberFile: data is an array of string paths to text files containing comma sepa
 
 using json = nlohmann::json; //Json instead of long name for namespace
 
+#define DATATYPESTR(x) ( (x == 0) ? "image" : (x == 1) ? "number" : (x == 2) ? "CSV file" : "unknown" )
+
 class dataLoader //Class for loading different types of training data from a folder with manifest.json
 {
 public:
@@ -37,10 +39,13 @@ public:
         number,
         textFile
     };
+    
     std::string error;     //The error string
     json manifest;         //The manifest.json object in C++
 
     int w, h, ch; //All image sizes
+
+    bool valid = false;
     
     dataTypes inputType;
     dataTypes outputType;
